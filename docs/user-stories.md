@@ -1,196 +1,130 @@
 # User Story Backlog: Siftarr
 
-This backlog lists the user stories and acceptance criteria required to build Siftarr. The backlog is divided into Epics representing core modules of the application.
+This backlog organizes Siftarr's features and acceptance criteria into the three distinct execution phases of the roadmap.
 
 ---
 
-## Epic 1: Global Navigation & Media Picker
+## Phase 1: Core Curation Utility (Radarr & Tautulli MVP)
 
-### User Story 1.1: Multi-Tab Layout
+### Epic 1: Inbox Dashboard & Media Cards
+
+#### User Story 1.1: Management Feed Card Stack
 *   **As a** user,
-*   **I want to** navigate between Discovery, Management, Deletion Queue, and Settings tabs,
-*   **So that** I can easily access all functions of the application in a single view.
+*   **I want** a stack of cards representing movies in my Radarr library,
+*   **So that** I can review their quality profiles and file details.
 *   **Acceptance Criteria**:
-    *   Responsive, glowing tab bar visible on both desktop and mobile layouts.
-    *   Active tab is visually highlighted.
-    *   State is preserved where appropriate when switching tabs (e.g., current settings form input or deletion queue selections).
+    *   Cards show title, year, size, active resolution, source format, and Tautulli watch stats.
+    *   Cards use soft dark glass panels (`rgba(15, 15, 15, 0.7)`) to prevent visual fatigue.
+    *   Reordering and layout transitions are fluid.
 
-### User Story 1.2: Dynamic Library Picker Dropdown
-*   **As a** user with multiple libraries (e.g. Movies, Kids Movies, Documentaries, TV Shows),
-*   **I want** a dropdown selector in the header to switch between my configured libraries,
-*   **So that** I can curate separate collections independently.
+#### User Story 1.2: Tautulli Stats Integration
+*   **As a** user,
+*   **I want to** see Plex play count and watch history details on movie cards,
+*   **So that** I can easily spot unwatched content or high-usage items.
 *   **Acceptance Criteria**:
-    *   Renders as a glassmorphic dropdown listing all active Library Profiles.
-    *   If only a single Library Profile is configured, the dropdown displays as a static, non-interactive badge.
-    *   Selecting a profile (e.g. "Kids Movies") filters card feeds to its specific media type and root folder path.
-    *   The selector immediately updates the card deck of the active tab without requiring a page refresh.
+    *   Displays play count (e.g. `▶ 12 plays`), last played time (e.g. `🕒 3 weeks ago`), and cumulative watch time.
+    *   Plex icon is visible adjacent to the stats.
+    *   Tautulli data is cached locally to ensure instant load times.
+
+#### User Story 1.3: Curation Swipes & Tap Action Buttons
+*   **As a** user,
+*   **I want** swipe gestures and tap buttons below the cards,
+*   **So that** I can select standard WebDL (Left/Blue), BluRay (Right/Green), Remux (Up/Gold), or Delete (Down/Red).
+*   **Acceptance Criteria**:
+    *   Four buttons are visible at the bottom of the card stack.
+    *   Card borders scale and glow with the action's corresponding color dynamically only on drag or button tap.
+    *   Action triggers staging of the curation update.
 
 ---
 
-## Epic 2: Discovery Feed & Swiping
+### Epic 2: Safety & Undo Actions
 
-### User Story 2.1: Recommendation-Curation Card Stack
+#### User Story 2.1: 7-Second Undo Buffer
 *   **As a** user,
-*   **I want** a stack of cards representing movies or TV shows not currently in my library,
-*   **So that** I can explore new media to add.
+*   **I want** a 7-second window to reverse my curation decisions,
+*   **So that** I do not accidentally downgrade or delete files due to a mis-swipe.
 *   **Acceptance Criteria**:
-    *   Shows cover poster, title, year, rating, and genres.
-    *   The discovery feed dynamically maps to the active Library Profile's media type (`movie` -> TMDB Movies/Radarr, `tv` -> TMDB TV/Sonarr).
-    *   Items already existing in the corresponding *arr library matching the configured root folder are automatically filtered out.
-    *   Items previously skipped (Left-swiped) are omitted.
-    *   Feed is sorted by local recommendation taste weights (highest match first).
+    *   Performing an action displays a floating bottom toast with a 7-second countdown.
+    *   Toast has a countdown ring and an `[ UNDO ]` button.
+    *   Clicking undo halts the operation and returns the card back to the stack.
+    *   If the timer expires, backend commits the API/database change.
 
-### User Story 2.2: Swiping Right to Add Media (Like)
-*   **As a** user,
-*   **I want to** swipe right (or tap a "Like" button) on a card,
-*   **So that** it gets added to my Radarr or Sonarr download queue using my default configuration.
-*   **Acceptance Criteria**:
-    *   Visual badge overlay "LIKE" appears and increases opacity as the card is dragged right.
-    *   Triggers backend API call to add the movie or TV show to Radarr/Sonarr.
-    *   Adds +1.0 weight to the item's genres and creators in the local taste profile.
-
-### User Story 2.3: Swiping Left to Skip (Dislike)
-*   **As a** user,
-*   **I want to** swipe left (or tap "Skip") on a card,
-*   **So that** it is bypassed and never shown to me again.
-*   **Acceptance Criteria**:
-    *   Visual badge overlay "SKIP" appears as the card is dragged left.
-    *   Logs the TMDB ID and media type into the `skipped_items` database table.
-    *   Applies a -0.5 weight to corresponding genres and creators.
-
-### User Story 2.5: Keyboard Curation (Discovery Mode)
+#### User Story 2.2: Desktop Hotkey Isolation
 *   **As a** desktop user,
-*   **I want to** control swiping actions using my keyboard,
-*   **So that** I can rapidly curate media without using touch or mouse drag gestures.
+*   **I want** arrow keys and W/A/S/D key bindings disabled when entering text,
+*   **So that** typing API credentials doesn't trigger card swipe actions.
 *   **Acceptance Criteria**:
-    *   Pressing `Right Arrow` or `D` triggers "Like" (Swipe Right).
-    *   Pressing `Left Arrow` or `A` triggers "Skip" (Swipe Left).
-    *   Pressing `Up Arrow` or `W` triggers "God Tier" (Swipe Up).
-    *   Triggers card tilt-and-fly animations in the corresponding direction.
+    *   Pressing A/D/W/S curates cards normally.
+    *   Focusing inside input fields or Settings panels disables hotkey listeners.
 
 ---
 
-## Epic 3: Library Curation (Management Mode)
+### Epic 3: Deletion Review & Settings
 
-### User Story 3.1: Library Curation Feed
+#### User Story 3.1: Sequential Deletion execution
 *   **As a** user,
-*   **I want to** browse a stack of cards representing my existing media library,
-*   **So that** I can inspect files and decide to upgrade, downgrade, or delete them.
+*   **I want** staged deletions to execute sequentially with a progress indicator,
+*   **So that** I do not overload my Radarr container.
 *   **Acceptance Criteria**:
-    *   Renders existing Radarr movies or Sonarr TV series.
-    *   Shows a badge overlay indicating file details:
-        *   Movies: resolution, folder size, dominant source (e.g. REMUX, BluRay, WEBDL, HDTV), and TRaSH Guides Custom Format Tags (e.g. x265, HEVC, Atmos, HDR10, DV).
-        *   TV Shows: number of episodes downloaded vs. total episodes, total folder size, dominant source, and current quality profile.
-        *   Displays the active Custom Format Score calculated by Radarr/Sonarr to easily verify TRaSH Guides alignment.
+    *   A progress bar shows execution steps (e.g. `Deleting 4 of 12`).
+    *   Deletions are processed one by one.
+    *   User can hit "Cancel" to stop processing remaining queue items.
 
-### User Story 3.2: Mapping Quality via Swiping
+#### User Story 3.2: SQLite Settings Store
 *   **As a** user,
-*   **I want to** swipe a library card standard WebDL (Left), BluRay (Right), or Remux (Up),
-*   **So that** Siftarr updates the quality profile (which has custom format cutoff scores configured via Recyclarr or manually) in Radarr/Sonarr and triggers an automatic search.
+*   **I want** settings and profiles stored in a local SQLite database,
+*   **So that** I can configure my app through the UI without editing text files.
 *   **Acceptance Criteria**:
-    *   Swipe Left (WebDL) maps the item to the WebDL quality profile (saving space if it was a larger BluRay/REMUX) and triggers search.
-    *   Swipe Right (BluRay) maps the profile to the BluRay quality profile and triggers search.
-    *   Swipe Up (Remux) upgrades the profile directly to the premium/highest Remux profile and triggers search.
-    *   Triggers search commands in Radarr (`MoviesSearch`) or Sonarr (`SeriesSearch`).
-
-### User Story 3.3: Swiping Down to Queue for Deletion
-*   **As a** user,
-*   **I want to** swipe down on a library card,
-*   **So that** the item is added to the Deletion Review Queue instead of being deleted instantly.
-*   **Acceptance Criteria**:
-    *   Visual badge overlay "DELETE" appears on downward drag.
-    *   The item is stored in the local `deletion_queue` table.
-    *   The card is removed from the active Management stack.
-
-### User Story 3.4: Keyboard Curation (Management Mode)
-*   **As a** desktop user,
-*   **I want to** trigger library curation swipes using my keyboard,
-*   **So that** I can manage my existing collection with high speed.
-*   **Acceptance Criteria**:
-    *   Pressing `Right Arrow` or `D` triggers "BluRay" quality profile mapping.
-    *   Pressing `Left Arrow` or `A` triggers "WebDL" quality profile mapping.
-    *   Pressing `Up Arrow` or `W` triggers "Remux" quality profile mapping.
-    *   Pressing `Down Arrow` or `S` triggers "Queue for Deletion" (Swipe Down).
-    *   Triggers the same card animation physics as the respective drag gesture.
-
-### User Story 3.5: Tautulli Curation Metrics on Card
-*   **As a** user,
-*   **I want to** see how many times and how recently a movie or TV show has been watched in my Plex library via Tautulli,
-*   **So that** I can make informed decisions to delete unused media, keep popular media, or upgrade active content.
-*   **Acceptance Criteria**:
-    *   Cards in Management Mode display play counts, last played timestamps, and watch time when Tautulli is enabled.
-    *   If an item has 0 plays and was added more than 30 days ago, a desaturated red warning indicator highlights it.
-    *   If Tautulli is not configured or disabled, the metrics overlay is hidden gracefully, and the card layout collapses nicely without any empty space.
+    *   API configuration form saves/loads credentials directly to SQLite.
+    *   A "Test Connection" button gives immediate visual status checks.
 
 ---
 
-## Epic 4: Deletion Safety Queue
+## Phase 2: Sonarr, Quality Explainability & Custom Libraries
 
-### User Story 4.1: Queue Table Interface
-*   **As a** user,
-*   **I want** to see a list of all items queued for deletion with metadata,
-*   **So that** I can verify what is going to be deleted before executing it.
-*   **Acceptance Criteria**:
-    *   Lists titles, years, media types, disk space occupied, and folder paths.
-    *   Displays a total reclaimed disk space calculation at the top.
+### Epic 4: TV Show Support & Safety Warnings
 
-### User Story 4.2: Confirming and Cancelling Deletions
+#### User Story 4.1: TV Show Cards & Series Warning Badge
 *   **As a** user,
-*   **I want** options to confirm deletion or keep items in my library,
-*   **So that** I can resolve the list safely.
+*   **I want** TV show cards in Sonarr to display a series-level safety warning,
+*   **So that** I don't accidentally update profiles or delete entire series unknowingly.
 *   **Acceptance Criteria**:
-    *   "Keep" button removes the item from the queue and restores it to the pool.
-    *   "Delete" button calls the Radarr/Sonarr API with `deleteFiles=true`, then deletes the database entry.
-    *   "Confirm All" button performs deletions in batch with status bars.
+    *   TV card displays a clear badge: `⚠️ Affects Series: X Seasons, Y Episodes`.
+
+#### User Story 4.2: TRaSH Quality Explainability
+*   **As a** user,
+*   **I want** to see current custom formats and TRaSH scores on card overlays,
+*   **So that** I understand the score gains before upgrading or downgrading.
+*   **Acceptance Criteria**:
+    *   Queries `customFormatScore` directly from Radarr/Sonarr file metadata.
+    *   Displays current score and tags, and shows expected score changes on drag.
+
+#### User Story 4.3: Custom Library Profiles Manager
+*   **As a** user,
+*   **I want to** configure custom libraries with root folder and Tautulli Section mappings,
+*   **So that** I can filter curation lists (e.g., Kids Movies vs. Stand-up).
+*   **Acceptance Criteria**:
+    *   Settings tab displays a profiles list.
+    *   Header displays picker dropdown listing all enabled profiles.
 
 ---
 
-## Epic 5: System Settings
+## Phase 3: Personalized Discovery
 
-### User Story 5.1: API Integrations Setup
-*   **As a** user,
-*   **I want to** enter my Radarr, Sonarr, and TMDB credentials,
-*   **So that** Siftarr can connect to my self-hosted services.
-*   **Acceptance Criteria**:
-    *   Fields: Radarr URL/Key, Sonarr URL/Key, TMDB API Key.
-    *   "Test Connection" buttons verify validity and retrieve dynamic Quality Profiles.
-    *   Settings are read/written to a standard configuration file (`config.yml`).
+### Epic 5: Discovery Mode & Recommendations
 
-### User Story 5.2: Profile Mappings Selection
+#### User Story 5.1: Discovery Feed Curation
 *   **As a** user,
-*   **I want to** map Siftarr's actions (Standard, Really Good, God Tier) to actual Quality Profiles,
-*   **So that** swipes trigger the correct settings on my servers.
+*   **I want** recommendations of new media not present in my library,
+*   **So that** I can add them to Radarr or Sonarr.
 *   **Acceptance Criteria**:
-    *   Dropdown pickers populated dynamically from Radarr/Sonarr APIs.
-    *   Separate profile mapping configurations for Movies and TV Shows.
-    *   Easily maps to custom profiles synchronized by Recyclarr.
+    *   Fetches movies/TV shows from TMDB matching the active library type.
+    *   Filters out existing titles in *arr.
 
-### User Story 5.3: Tautulli Integration Configuration
+#### User Story 5.2: Recommendation weights
 *   **As a** user,
-*   **I want to** enter my Tautulli URL and API Key in the Settings tab,
-*   **So that** Siftarr can fetch and display Plex watch statistics for my media.
+*   **I want** Siftarr to learn my preferences from my library history and Plex playback frequency,
+*   **So that** the discovery feed matches my tastes.
 *   **Acceptance Criteria**:
-    *   Tautulli URL and API Key input fields exist in Settings.
-    *   A toggle switch allows enabling/disabling the Tautulli integration.
-    *   A "Test Connection" button performs a handshake with Tautulli and shows a visual validation response.
-
-### User Story 5.4: Independent *arr Instance Configuration
-*   **As a** user,
-*   **I want to** configure only Radarr or only Sonarr in Settings,
-*   **So that** I can use Siftarr for just movies or just TV shows without configuring both.
-*   **Acceptance Criteria**:
-    *   Saving settings succeeds even if one of the URL/API Key pairs for Radarr or Sonarr is omitted or cleared.
-    *   The unconfigured service's tabs/features are disabled in the UI.
-    *   The header picker hides or locks to the single active service.
-    *   The backend runs normally and does not crash or log constant connection errors for the missing service.
-
-### User Story 5.5: Managing Custom Library Profiles
-*   **As a** user,
-*   **I want to** add, edit, toggle, or delete library profiles in my Settings,
-*   **So that** I can customize Siftarr's library segments and map them to Plex/Tautulli and *arr subdirectories.
-*   **Acceptance Criteria**:
-    *   A "Library Profiles Manager" section is visible in the Settings tab.
-    *   An "Add Library" button opens a modal allowing input of Name, Media Type (Movies/TV), Root Folder Path, and Tautulli Section ID.
-    *   Fields like Root Folder Path and Tautulli Section ID display dropdowns populated dynamically from active service API queries.
-    *   Users can toggle a library profile off/on (inactive profiles are hidden from the header picker).
-    *   Profiles can be reordered by dragging, and deleted by clicking a delete icon.
+    *   Swipes adjust weight factors in SQLite.
+    *   Plex play counts from Tautulli boost weight metrics for similar genres.

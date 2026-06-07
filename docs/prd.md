@@ -1,102 +1,68 @@
 # Product Requirements Document (PRD): Siftarr
 
 ## 1. Product Vision & Overview
-Siftarr is a gamified, self-hosted web application for the *arr suite (specifically starting with Radarr and Sonarr). It solves the problem of tedious library curation and discovery by bringing a Tinder-style swipe interface to media management. Users can quickly upgrade their library quality, prune unwanted content, and discover new movies or TV shows that adapt to their taste over time.
+Siftarr is a stateful **"ARR Review Layer"** designed to gamify and simplify self-hosted library curation. Centering around a **Review Inbox** dashboard, Siftarr helps users quickly audit their existing media collection, upgrade or downgrade quality profiles based on actual usage, and prune unwanted files. Using a Tinder-style swipe interface, card tap buttons, and desktop hotkeys, curation becomes rapid and secure.
+
+To manage development complexity and deliver immediate value, Siftarr's roadmap is divided into three distinct execution phases.
 
 ---
 
-## 2. Core Features
+## 2. Roadmap Phases & Features
 
-### 2.0. Library Picker
-* **Objective**: Define the active media library (e.g. Movies, Kids Movies, Documentaries, TV Shows).
-* **Functionality**:
-  * An expandable, glassmorphic dropdown selector accessible in the header/navbar on both the Discovery and Management tabs.
-  * Displays user-defined **Library Profiles** configured in Settings.
-  * Switching the active library updates all feeds, card decks, recommendation filters, and deletion queues:
-    * **Movie-type Library Profiles**: Points to Radarr (optionally filtered by a specific root folder path) and TMDB Movie endpoints.
-    * **TV-type Library Profiles**: Points to Sonarr (optionally filtered by a specific root folder path) and TMDB TV Show endpoints.
-  * **Dynamic Visibility**:
-    * If only a single Library Profile is defined and enabled in Settings, the Library Picker is hidden from the header to maximize screen space.
-    * If multiple Library Profiles are enabled, the picker is shown, allowing rapid switching between collections (even if all libraries map to the same backend service, e.g. multiple distinct Movie folders in a single Radarr instance).
+### Phase 1: Core Curation Utility (MVP)
+The MVP establishes a stable curation loop for Movies, integrating Radarr and Tautulli watch history.
 
-### 2.1. Discovery Mode (Tab 1 - Default)
-* **Objective**: Browse media not in the user's library and add them to Radarr or Sonarr.
-* **Card Feed**:
-  * **Source Resolution**: The discovery feed adapts dynamically to the active Library Profile type:
-    * For **Movie-type Library Profiles** (e.g. "Kids Movies", "Documentaries"), Siftarr pulls recommendations from TMDB Movie endpoints (popular, trending, genre lists). It filters out movies already present in the Radarr library (matching the configured root folder path for that library).
-    * For **TV-type Library Profiles** (e.g. "TV Shows"), Siftarr pulls recommendations from TMDB TV Show endpoints. It filters out series already present in the Sonarr library.
-* **Swipe Actions**:
-  * **Swipe Right (Like)**: Sends the item to Radarr/Sonarr to add and start downloading. Uses the default Discovery profile configured in Settings.
-  * **Swipe Left (Skip/Dislike)**: Skips the item. The item ID is logged to a local database skip list so it won't appear again.
-  * **Swipe Up (Super Like)**: Sends the item to Radarr/Sonarr with the "God Tier" quality profile and starts downloading.
-* **Smart Recommendations**:
-  * Records metadata (genres, creators/directors, cast, release decade) of swiped items.
-  * Adjusts weights in a local taste profile (likes increase weights, dislikes decrease them), stored separately for Movies and TV Shows.
-  * Sorts and curates the card feed using this profile so higher-matching items appear first.
+*   **Review Inbox Dashboard**: A single management feed displaying active Movies in the Radarr library. 
+*   **Media Detail Cards**: Displays movie poster, title, year, runtime, active file metadata (resolution, size, and source format e.g. REMUX, BluRay, WEBDL), and Tautulli Plex watch statistics.
+*   **Tautulli Usage Indicators**: Displays play count, last played time, and cumulative watch duration. Highlights candidates for deletion (e.g., 0 plays, added >30 days ago).
+*   **Curation Actions**:
+    *   **Downgrade to WebDL**: Swipe Left or tap the WebDL button.
+    *   **Upgrade to BluRay**: Swipe Right or tap the BluRay button.
+    *   **Upgrade to Remux**: Swipe Up or tap the Remux button.
+    *   **Queue for Deletion**: Swipe Down or tap the Delete button.
+*   **Safety Undo Buffer**: A 7-second undo window. When a curation action is taken, it is staged temporarily, and a floating toast with an `[ UNDO ]` button appears. The actual database/API updates are committed only after the 7-second buffer expires.
+*   **Deletion Queue**: A dedicated review screen listing all staged deletions. Items can be individually restored ("Keep") or deleted in bulk.
+*   **SQLite Settings Store**: Configuration for Radarr and Tautulli credentials, default profiles, and mapping tables are stored directly in the local SQLite database.
 
-### 2.2. Management Mode (Tab 2)
-* **Objective**: Curate existing library items, upgrading or downgrading files by mapping swipes directly to quality tiers.
-* **Card Feed**:
-  * **Movies**: Displays movies currently in the Radarr library. Cards show active file metadata (Resolution, File Size, Source like REMUX, BluRay, WEBDL, HDTV) and Tautulli usage stats (Play Count, Last Played, and Cumulative Watch Time) if Tautulli is configured. These stats drive user decisions (e.g. deleting unwatched movies, keeping highly played ones, or upgrading/downgrading quality profiles).
-  * **TV Shows**: Displays TV series currently in the Sonarr library. Cards show series-level metadata (Episodes Downloaded vs. Total, Total Folder Size, Current Quality Profile, dominant file source) and Tautulli usage stats (Total series play count, last played date of any episode, and cumulative series watch time) if configured.
-* **Swipe Actions**:
-  * **Swipe Left (Standard / WebDL)**: Maps the item's Radarr/Sonarr profile to a standard WEB-DL/WebDL quality profile (saving space if it was a larger BluRay/REMUX) and triggers search.
-  * **Swipe Right (High Quality / BluRay)**: Maps the profile to a BluRay quality profile (upgrading if it was WEBDL/HDTV) and triggers search.
-  * **Swipe Up (God Tier / Remux)**: Maps the profile to the highest quality Remux profile and triggers search.
-  * **Swipe Down (Queue for Deletion)**: Adds the item to the local Deletion Review Queue. Does *not* delete files immediately.
+---
 
-### 2.3. Deletion Review Queue (Tab 3)
-* **Objective**: Safeguard against accidental file deletion from swipe gestures.
-* **Functionality**:
-  * Lists all items (Movies and TV Shows) swiped down in Management Mode.
-  * Shows title, media type, release year, size, and library location.
-  * Option to **Confirm Deletion** (calls Radarr/Sonarr API to delete the media and its files).
-  * Option to **Cancel / Keep** (removes the item from the review queue and puts it back in the pool).
-  * Option to **Confirm All**.
+### Phase 2: Sonarr & Quality Explainability
+Phase 2 expands curation to TV series and integrates advanced TRaSH Guides explainability.
 
-### 2.4. Settings (Tab 4)
-* **Objective**: Configure credentials and app behavior.
-* **Settings Fields**:
-  * **Radarr URL** & **Radarr API Key** (optional if Sonarr is configured)
-  * **Sonarr URL** & **Sonarr API Key** (optional if Radarr is configured)
-  * **Tautulli URL** & **Tautulli API Key** (optional, for viewing usage statistics to drive curation)
-  * **TMDB API Key** (for fetching discovery lists)
-  * **Profile Mappings**: Match Siftarr's swipe directions (Standard, Really Good, God Tier) to actual Quality Profiles fetched dynamically from Radarr and Sonarr.
-  * **Default Discovery Profiles**: The Radarr/Sonarr profile used when swiping right in Discovery Mode.
-  * **Reset Data**: Option to wipe recommendation weights, skipped lists, and database.
-  * **Library Profiles Management**: Section to define custom Library Profiles. Users can add, edit, or delete libraries, naming them (e.g. "Kids Movies") and specifying their Type (Radarr/Sonarr), root folder filter, and associated Tautulli Plex Library Section ID.
-  * **Independent Service Verification**: Individual "Test Connection" buttons for Radarr, Sonarr, and Tautulli. The app validates only the configured services and handles unconfigured services gracefully.
+*   **Sonarr TV Series Curation**: Adds TV Shows mode.
+    *   **Series Scope Safety Warning**: Because modifying a TV show's quality profile in Sonarr affects all episodes in that series, cards show a prominent safety warning: `⚠️ Affects: Entire Series (X Seasons, Y Episodes)`.
+*   **TRaSH Score Explainability UI**: Displays active custom formats (e.g. HDR10, DV, Atmos) and the exact custom format score calculated by Sonarr/Radarr. Displays the expected score/quality gain before triggering an upgrade/downgrade swipe.
+*   **Custom Library Profiles**: Allows users to configure multiple custom libraries (e.g., "Movies", "Kids Movies", "Documentaries") that filter the curation feed by specific Radarr/Sonarr root folder paths and Plex/Tautulli section IDs.
+
+---
+
+### Phase 3: Personalized Discovery
+Phase 3 adds recommendations, enabling users to explore new media and add them to their download queues.
+
+*   **Discovery Mode**: Browse media not present in the library (pulled from TMDB trending, popular, and genre lists).
+*   **Swipe to Add**: Swipe Right to add a movie/show to the download queue, or Swipe Left to skip (saving to a local skip list).
+*   **Personalized Taste Profile**: A local recommendation engine that updates weight profiles (based on genres, release decades, directors, and actors) from swiping behavior and frequent Tautulli playback indicators.
 
 ---
 
 ## 3. UI/UX Design Goals
-
-* **Aesthetics**: Modern, glassmorphic dark mode. Deep charcoal/black background with glowing neon accents (green for likes, gold for god-tier, red for delete, blue for standard).
-* **Gestures**: Smooth card dragging with realistic physics, rotation, and spring-back if released. Touch-gesture support for mobile devices.
-* **Visual Cues**: Clear, colored overlay text/badges (e.g., "GOD TIER" on swipe up, "DELETE" on swipe down) that fade in as the card is dragged in that direction.
-* **Card Layout**: A large high-res poster taking up most of the card, with title, year, genres, rating, and runtime at the bottom. In Management Mode, file stats (Size, Resolution, or Episode progress) will be highlighted in a sleek badge overlay.
+*   **Aesthetics**: OLED-fatigue prevention theme. Uses soft, dark charcoal/glass panels (`rgba(15, 15, 15, 0.7)`) instead of high-contrast pitch-black blocks. 
+*   **Tactile Feedback**: Responsive outlines and glows that scale dynamically during card drags.
+*   **Tap Buttons**: Layout includes clear tap buttons below the card stack for quick, one-handed touch navigation.
+*   **Safety Toast**: A persistent bottom toast showing a countdown timer (e.g. `Undoing in 5s...`) and a prominent `UNDO` button.
+*   **Desktop Hotkey Isolation**: Keyboard hotkeys (W/A/S/D and Arrow Keys) are isolated and disabled whenever focus is in input fields or settings panels.
 
 ---
 
-## 4. Technical Architecture & Stack
-
-### 4.1. Tech Stack
-* **Frontend**: React, Vite, TypeScript, Vanilla CSS, Framer Motion (for physics-based swiping).
-* **Backend**: Node.js, Express, TypeScript, SQLite (via `better-sqlite3` for local settings, history, and recommendation profile storage).
-* **APIs**:
-  * **Radarr API v3**: For movie sync, profile updates, search triggers, commands, and deletion.
-  * **Sonarr API v3**: For TV show sync, profile updates, search triggers, commands, and deletion.
-  * **TMDB API v3**: For discovery lists, genre details, and cast/crew metadata.
-
-### 4.2. Containerization
-* **Dockerfile**: Multi-stage build compiling React into static assets and starting the Express server.
-* **Volume Mounts**: A `/config` folder in the container mapped to the host to store the SQLite database (`siftarr.db`) and a configuration file (`config.json`), ensuring persistence across container updates.
+## 4. Technical Architecture
+*   **Frontend**: React, Vite, TypeScript, TailwindCSS/Vanilla CSS, Framer Motion.
+*   **Backend**: Node.js, Express, TypeScript, SQLite (`better-sqlite3`).
+*   **State & Caching**: Siftarr operates a local SQLite cache for API results (`arr_cache` and `tautulli_cache`) to speed up loading and prevent API rate-limiting or network delays.
+*   **Data Integrity**: Siftarr uses a complete GET-modify-PUT pipeline when communicating quality profile changes to Radarr/Sonarr APIs, guaranteeing that no metadata fields are dropped.
 
 ---
 
 ## 5. Success Criteria & Verification
-1. Successful fetching of Radarr/Sonarr media and profiles.
-2. Smooth card dragging physics working on both desktop (mouse) and mobile (touch).
-3. Accurate weight adjustment and list curation based on swiping behavior.
-4. Correct Radarr/Sonarr API commands triggered on swipe: profile update, search trigger, and deletion upon queue confirmation.
-5. Library Picker seamlessly switches all states between Movies and TV Shows.
+1.  **Phase 1 MVP Curation Loop**: Fetching Radarr/Tautulli data, displaying cards, executing 7-second delayed profile updates or deletion queuing, and executing sequential deletions.
+2.  **State Management**: Accurate configuration saving/loading in SQLite, settings verification handshakes, and local cache synchronization.
+3.  **UI Fluidity**: Zero keyboard shortcut collisions, smooth card physics, and robust desktop keydown input isolation.
