@@ -30,14 +30,14 @@ Siftarr is a gamified, self-hosted web application for the *arr suite (specifica
   * Sorts and curates the card feed using this profile so higher-matching items appear first.
 
 ### 2.2. Management Mode (Tab 2)
-* **Objective**: Curate existing library items, upgrading quality, downgrading to save disk space, or queueing them for deletion.
+* **Objective**: Curate existing library items, upgrading or downgrading files by mapping swipes directly to quality tiers.
 * **Card Feed**:
-  * **Movies**: Displays movies currently in the Radarr library. Cards show active file metadata: Resolution, File Size, and Source (e.g. WEBDL, Bluray, REMUX, HDTV).
-  * **TV Shows**: Displays TV series currently in the Sonarr library. Cards show series-level metadata: Number of Seasons/Episodes Downloaded vs. Total, Total Folder Size, current Quality Profile, and dominant file source (e.g., WEBDL, Bluray, HDTV).
+  * **Movies**: Displays movies currently in the Radarr library. Cards show active file metadata: Resolution, File Size, and Source (e.g. WEBDL, BluRay, REMUX, HDTV).
+  * **TV Shows**: Displays TV series currently in the Sonarr library. Cards show series-level metadata: Number of Seasons/Episodes Downloaded vs. Total, Total Folder Size, current Quality Profile, and dominant file source (e.g., WEBDL, BluRay, HDTV).
 * **Swipe Actions**:
-  * **Swipe Left (Downgrade/Keep)**: Downgrades the item's Radarr/Sonarr profile to a lower-tier profile (e.g., from REMUX/Bluray to WEBDL/HDTV) to save disk space, and triggers search, or keeps it if it is already at standard.
-  * **Swipe Right (Upgrade)**: Upgrades the profile to the next higher quality profile (e.g. from WEBDL to Bluray/REMUX) and triggers Radarr/Sonarr to search.
-  * **Swipe Up (God Tier Upgrade)**: Upgrades the profile to the premium/highest-quality profile (e.g., fully uncompressed 4K Remux) and triggers search.
+  * **Swipe Left (Standard / WebDL)**: Maps the item's Radarr/Sonarr profile to a standard WEB-DL/WebDL quality profile (saving space if it was a larger BluRay/REMUX) and triggers search.
+  * **Swipe Right (High Quality / BluRay)**: Maps the profile to a BluRay quality profile (upgrading if it was WEBDL/HDTV) and triggers search.
+  * **Swipe Up (God Tier / Remux)**: Maps the profile to the highest quality Remux profile and triggers search.
   * **Swipe Down (Queue for Deletion)**: Adds the item to the local Deletion Review Queue. Does *not* delete files immediately.
 
 ### 2.3. Deletion Review Queue (Tab 3)

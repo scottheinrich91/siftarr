@@ -78,18 +78,18 @@ This backlog lists the user stories and acceptance criteria required to build Si
 *   **Acceptance Criteria**:
     *   Renders existing Radarr movies or Sonarr TV series.
     *   Shows a badge overlay indicating file details:
-        *   Movies: resolution, folder size, dominant source (e.g. REMUX, Bluray, WEBDL, HDTV), and TRaSH Guides Custom Format Tags (e.g. x265, HEVC, Atmos, HDR10, DV).
+        *   Movies: resolution, folder size, dominant source (e.g. REMUX, BluRay, WEBDL, HDTV), and TRaSH Guides Custom Format Tags (e.g. x265, HEVC, Atmos, HDR10, DV).
         *   TV Shows: number of episodes downloaded vs. total episodes, total folder size, dominant source, and current quality profile.
         *   Displays the active Custom Format Score calculated by Radarr/Sonarr to easily verify TRaSH Guides alignment.
 
-### User Story 3.2: Upgrading and Downgrading Quality via Swiping
+### User Story 3.2: Mapping Quality via Swiping
 *   **As a** user,
-*   **I want to** swipe a library card standard (Left) or good (Right),
-*   **So that** I can either downgrade/keep the file to save disk space or upgrade it to a higher resolution.
+*   **I want to** swipe a library card standard WebDL (Left), BluRay (Right), or Remux (Up),
+*   **So that** Siftarr updates the quality profile (which has custom format cutoff scores configured via Recyclarr or manually) in Radarr/Sonarr and triggers an automatic search.
 *   **Acceptance Criteria**:
-    *   Swipe Left (Downgrade/Keep) changes the quality profile to a lower-tier profile (e.g. from REMUX to WEBDL) to save space, and triggers a search (or keeps standard).
-    *   Swipe Right (Upgrade) changes the profile to a higher-tier profile (e.g. from WEBDL to Bluray/REMUX) and triggers an automatic search.
-    *   Swipe Up (God Tier Upgrade) upgrades the profile directly to the premium/highest Remux profile and triggers search.
+    *   Swipe Left (WebDL) maps the item to the WebDL quality profile (saving space if it was a larger BluRay/REMUX) and triggers search.
+    *   Swipe Right (BluRay) maps the profile to the BluRay quality profile and triggers search.
+    *   Swipe Up (Remux) upgrades the profile directly to the premium/highest Remux profile and triggers search.
     *   Triggers search commands in Radarr (`MoviesSearch`) or Sonarr (`SeriesSearch`).
 
 ### User Story 3.3: Swiping Down to Queue for Deletion
@@ -106,9 +106,9 @@ This backlog lists the user stories and acceptance criteria required to build Si
 *   **I want to** trigger library curation swipes using my keyboard,
 *   **So that** I can manage my existing collection with high speed.
 *   **Acceptance Criteria**:
-    *   Pressing `Right Arrow` or `D` triggers "Upgrade" quality action.
-    *   Pressing `Left Arrow` or `A` triggers "Downgrade/Keep" quality action.
-    *   Pressing `Up Arrow` or `W` triggers "God Tier Upgrade" quality action.
+    *   Pressing `Right Arrow` or `D` triggers "BluRay" quality profile mapping.
+    *   Pressing `Left Arrow` or `A` triggers "WebDL" quality profile mapping.
+    *   Pressing `Up Arrow` or `W` triggers "Remux" quality profile mapping.
     *   Pressing `Down Arrow` or `S` triggers "Queue for Deletion" (Swipe Down).
     *   Triggers the same card animation physics as the respective drag gesture.
 

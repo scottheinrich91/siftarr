@@ -51,16 +51,16 @@ This document establishes the UI/UX design specifications, colors, and page layo
     *   **Glass Detail Panel (Bottom)**: Layered on top of the poster containing:
         *   Media Title & Release Year.
         *   Metadata tags (Genre badges, Rating, Runtime).
-        *   *Management Status overlays*: Displays active quality details: Resolution (e.g., `2160p`), Folder Size (e.g., `45.8 GB`), and Source (e.g., `REMUX`, `Bluray`, `WEBDL`, `HDTV`).
+        *   *Management Status overlays*: Displays active quality details: Resolution (e.g., `2160p`), Folder Size (e.g., `45.8 GB`), and Source (e.g., `REMUX`, `BluRay`, `WEBDL`, `HDTV`).
     *   **Swipe Overlay Badges**: Text overlays centered on the card that fade in relative to drag direction and offset distance:
         *   Discovery Mode: Dragging Right is "LIKE" (Neon Green), Dragging Left is "SKIP" (Slate), Dragging Up is "GOD TIER" (Gold).
-        *   Management Mode: Dragging Right is "UPGRADE" (Royal Violet), Dragging Left is "DOWNGRADE" (Electric Blue), Dragging Up is "GOD TIER" (Gold), Dragging Down is "DELETE" (Crimson Red).
+        *   Management Mode: Dragging Right is "BLURAY" (Royal Violet), Dragging Left is "WEBDL" (Electric Blue), Dragging Up is "REMUX" (Gold), Dragging Down is "DELETE" (Crimson Red).
 
 ### 2.3. Keyboard Controls (Desktop Mode)
 To support high-speed curation on desktop viewports, Siftarr intercepts keydown events on the card stack:
-*   **Swipe Right / Like (Discovery) / Upgrade (Management)**: `Right Arrow` or `D` key.
-*   **Swipe Left / Skip (Discovery) / Downgrade (Management)**: `Left Arrow` or `A` key.
-*   **Swipe Up / Super Like (Discovery) / God Tier Upgrade (Management)**: `Up Arrow` or `W` key.
+*   **Swipe Right / Like (Discovery) / BluRay (Management)**: `Right Arrow` or `D` key.
+*   **Swipe Left / Skip (Discovery) / WebDL (Management)**: `Left Arrow` or `A` key.
+*   **Swipe Up / Super Like (Discovery) / Remux (Management)**: `Up Arrow` or `W` key.
 *   **Swipe Down / Delete (Management only)**: `Down Arrow` or `S` key.
 *   *Keypress Feedback*: Pressing a key triggers a visual card animation (tilting and flying off-screen in the corresponding direction) mimicking the mouse/touch swipe gesture.
 
