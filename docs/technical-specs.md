@@ -17,7 +17,7 @@ CREATE TABLE settings (
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 ```
-*Standard Keys*: `radarr_url`, `radarr_api_key`, `sonarr_url`, `sonarr_api_key`, `tautulli_url`, `tautulli_api_key`, `tmdb_api_key`, `is_tautulli_enabled`, `quality_profile_mappings`.
+*Standard Keys*: `radarr_url`, `radarr_api_key`, `sonarr_url`, `sonarr_api_key`, `tautulli_url`, `tautulli_api_key`, `tmdb_api_key`, `is_tautulli_enabled`, `quality_profile_mappings`, `delete_file_on_upgrade`, `delete_file_on_downgrade`.
 
 ### 1.2. Table: `library_profiles`
 Allows users to segment their collections (e.g. Movies vs Kids Movies).
@@ -100,11 +100,16 @@ CREATE TABLE activity_log (
 
 ## 2. API Pipelines & Curation Logic
 
-### 2.1. API PUT Payload Completeness
+### 2.1. API PUT Payload Completeness & File Deletion Logic
 When updating a movie's quality profile in Radarr (`PUT /api/v3/movie/{id}`), Siftarr implements a GET-modify-PUT pipeline:
 1. **GET**: Retrieve the full, up-to-date movie object from Radarr.
 2. **Modify**: Update only the `qualityProfileId` in memory.
-3. **PUT**: Send the complete, unaltered object back to Radarr. This guarantees that custom paths, tags, genres, or metadata are not dropped during execution.
+3. **Compare**: Compare the rank of the current quality profile with the rank of the target quality profile to classify the action as an **Upgrade** or a **Downgrade**.
+4. **Conditional Disk Cleanup**:
+   - If Siftarr detects an **Upgrade** and the setting `delete_file_on_upgrade` is active: the backend queries the movie's active file ID and calls Radarr's `DELETE /api/v3/moviefile/{fileId}` endpoint to delete the file before making the profile update.
+   - If Siftarr detects a **Downgrade** and the setting `delete_file_on_downgrade` is active: the backend calls Radarr's `DELETE /api/v3/moviefile/{fileId}` to clear the existing file before updating the profile.
+5. **PUT**: Send the complete, modified object back to Radarr. This guarantees that custom paths, tags, genres, or metadata are not dropped during execution.
+6. **Search Trigger**: Dispatch a search command (`MoviesSearch`) to force Radarr to query indexers and download a fresh file immediately.
 
 ### 2.2. Radarr Custom Format Parsing
 Instead of re-implementing TRaSH scoring logic, Siftarr queries Radarr's `GET /api/v3/movie` API and extracts the score directly from the movie's active file payload:
@@ -119,11 +124,16 @@ For active libraries, Siftarr resolves rating keys and pulls playback details:
 * **Watch Stats**: `GET /api/v2?apikey={key}&cmd=get_item_watch_time_stats&rating_key={rating_key}`
   - Fetches play count, watch duration, and last played timestamp.
 
+### 2.4. Recyclarr Integration Compatibility
+Siftarr is built to be compatible with **Recyclarr** and automated **TRaSH Guides** setups:
+* **Item-Level Assignment**: Siftarr modifies only the `qualityProfileId` field inside individual movie or show entities (the same as changing the profile assignment in the Radarr/Sonarr UI).
+* **Profile Definition Safety**: Siftarr does not modify global Quality Profile definitions or Custom Format scoring lists. Since Recyclarr only synchronizes global definitions and scores, scheduled Recyclarr runs will not overwrite Siftarr's per-item profile changes.
+
 ---
 
 ## 3. Curation Operations & Schedulers
 
-### 3.1. 7-Second Undo Buffer
+### 3.1. 7-Second Undo Buffer & Neutral Skip Routing
 To protect against accidental swipes, Siftarr executes profile updates and deletion queuing through an asynchronous in-memory scheduler:
 1. **Action Request**: The user swipes/taps an item. The frontend sends the action to the backend.
 2. **Immediate Return**: The backend creates a unique `transaction_id`, registers a pending task in-memory with a 7-second timeout, and returns `200 OK` to the frontend with the ID.
@@ -131,6 +141,9 @@ To protect against accidental swipes, Siftarr executes profile updates and delet
 4. **Execution/Cancellation**:
    - **Commit**: If 7 seconds elapse without an undo request, the backend executes the API PUT mutation or writes the item to the SQLite `review_queue`, logging the transaction in `activity_log`.
    - **Undo**: If the user clicks `[ UNDO ]` on the frontend, the client sends a `POST /api/curate/undo` with the `transaction_id`. The backend clears the timeout, canceling the staged action, and returns success.
+5. **Neutral Skip Bypass**:
+   - If the user taps `Keep / Skip` (or inputs a neutral skip command), the client triggers `POST /api/curate/skip`.
+   - Siftarr's backend bypasses the 7-second buffer entirely, logs the event directly to the SQLite `activity_log` (with action: `skipped`), and returns immediately to advance the card deck without making any changes in Radarr/Sonarr.
 
 ### 3.2. Serialized Deletion Queue Execution
 When confirming deletions in the Review Queue, sending dozens of concurrent HTTP DELETE requests to Radarr/Sonarr can overwhelm the container or the server. Siftarr processes deletions sequentially:

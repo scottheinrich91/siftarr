@@ -46,6 +46,14 @@ Siftarr is styled as a premium, mobile-first visual experience:
 ## 🛠 Technical Stack (Planned)
 
 *   **Frontend**: React, Vite, TypeScript, Vanilla CSS, Framer Motion (for physics-based swipe gestures).
-*   **Backend**: Node.js, Express, TypeScript, structured Winston log rotation, YAML-based settings (`config.yml`).
-*   **Database**: SQLite (`better-sqlite3` with an automated startup SQL migration engine).
+*   **Backend**: Node.js, Express, TypeScript, structured Winston log rotation.
+*   **Database & Settings**: SQLite (`better-sqlite3` with an automated startup SQL migration engine). Configuration settings are stored directly in the database.
 *   **Containerization**: Docker multi-stage builds supporting PUID/PGID non-root privilege dropping.
+
+---
+
+## 🤝 Recyclarr & TRaSH Guides Compatibility
+
+Siftarr is built to be 100% compatible with **Recyclarr** and automated **TRaSH Guides** profile syncs:
+*   **Profile Assignments Only**: Siftarr modifies individual movie/show quality profile *assignments* (e.g. changing which profile is selected for a movie). It does not edit the profile definitions or custom format scores themselves.
+*   **Safe Synced Setups**: Because Recyclarr only updates global profile templates and custom formats, running Recyclarr on a schedule will not reset Siftarr's per-item profile settings. your changes will persist cleanly.

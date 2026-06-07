@@ -29,11 +29,12 @@ To prevent visual fatigue caused by extreme high-contrast pitch-black blocks, Si
 
 ### 2.1. Card Stack Component & Tap Actions
 The card feed is optimized for both gesture swiping and button tapping.
-*   **Tap Buttons Layout**: Positioned directly underneath the card stack, Siftarr displays a horizontal row of four glassmorphic buttons for quick curation:
+*   **Tap Buttons Layout**: Positioned directly underneath the card stack, Siftarr displays a horizontal row of five glassmorphic buttons for quick curation:
     *   **Electric Blue Button**: Label `WEBDL`, triggers Standard/WebDL downgrade.
     *   **Neon Green Button**: Label `BLURAY`, triggers BluRay upgrade.
     *   **Neon Gold Button**: Label `REMUX`, triggers Remux upgrade.
     *   **Crimson Red Button**: Icon `Trash`, triggers Deletion queue staging.
+    *   **Slate Grey Button**: Icon `Check` (or label `SKIP`), advances the card with no profile changes.
 *   **Dynamic Tag overlays**: Badges on the cards show file details (resolution, folder size, source format) and Tautulli watch stats (e.g. `▶ 12 plays`, `🕒 2d ago`). 
 *   **Series Scope Safety warning (Sonarr Mode)**: TV show cards show a desaturated yellow safety badge at the top: `⚠️ Affects Series: X Seasons, Y Episodes` to prevent accidental bulk updates.
 
@@ -45,7 +46,7 @@ When a curation action is triggered, a toast emerges from the bottom of the view
 
 ### 2.3. Desktop Hotkey Isolation
 To support rapid keyboard navigation without accidental triggers:
-*   **Hotkey Events**: `A`/`Left Arrow` (WebDL), `D`/`Right Arrow` (BluRay), `W`/`Up Arrow` (Remux), `S`/`Down Arrow` (Delete).
+*   **Hotkey Events**: `A`/`Left Arrow` (WebDL), `D`/`Right Arrow` (BluRay), `W`/`Up Arrow` (Remux), `S`/`Down Arrow` (Delete), `Spacebar`/`K` (Keep/Skip).
 *   **Input Isolation**: Event listeners intercept and ignore hotkey bindings when document focus is inside any text fields (`<input>`, `<textarea>`), dropdown selectors, or settings dialog modals.
 
 ### 2.4. Deletion Queue & Progress Indicators
@@ -56,7 +57,9 @@ To support rapid keyboard navigation without accidental triggers:
     *   A cancel button that halts the sequential queue after the current active deletion finishes.
 
 ### 2.5. Settings Layout & Profiles Manager
-*   **Settings Fields**: Input fields for Radarr, Sonarr, TMDB, and Tautulli credentials.
+*   **Settings Fields**: Input fields for Radarr, Sonarr, TMDB, and Tautulli credentials, accompanied by checkboxes for behavior flags:
+    *   "Delete old file when upgrading" (checkbox)
+    *   "Delete old file when downgrading" (checkbox)
 *   **Library Profiles Manager**:
     *   Displays configured library segments (e.g. "Movies", "Kids Movies") in a list with reordering drag handles.
     *   "Add Library" modal features type selector (Movies/TV), root folder path dropdown, and Tautulli Plex section dropdown.

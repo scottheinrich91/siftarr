@@ -31,9 +31,18 @@ This backlog organizes Siftarr's features and acceptance criteria into the three
 *   **I want** swipe gestures and tap buttons below the cards,
 *   **So that** I can select standard WebDL (Left/Blue), BluRay (Right/Green), Remux (Up/Gold), or Delete (Down/Red).
 *   **Acceptance Criteria**:
-    *   Four buttons are visible at the bottom of the card stack.
+    *   Five buttons are visible at the bottom of the card stack.
     *   Card borders scale and glow with the action's corresponding color dynamically only on drag or button tap.
     *   Action triggers staging of the curation update.
+
+#### User Story 1.4: Keep / Skip Action
+*   **As a** user,
+*   **I want** to tap a Slate Grey Skip/Keep button or press Spacebar/K,
+*   **So that** I can advance to the next card without changing any quality profiles or queueing deletions.
+*   **Acceptance Criteria**:
+    *   Tapping the Slate Grey Button (Checkmark icon) or pressing Spacebar/K bypasses the active card.
+    *   Logs the skipped action in the `activity_log` SQLite table.
+    *   The card stack animates and advances immediately without triggering the 7-second undo toast or calling *arr APIs.
 
 ---
 
@@ -77,6 +86,15 @@ This backlog organizes Siftarr's features and acceptance criteria into the three
 *   **Acceptance Criteria**:
     *   API configuration form saves/loads credentials directly to SQLite.
     *   A "Test Connection" button gives immediate visual status checks.
+
+#### User Story 3.3: File Deletion Settings Behavior
+*   **As a** self-hosted user,
+*   **I want** settings to configure if Siftarr deletes the old file when upgrading or downgrading,
+*   **So that** I can choose between additive searches or fully replacing existing media immediately.
+*   **Acceptance Criteria**:
+    *   Checkboxes for "Delete old file when upgrading" and "Delete old file when downgrading" exist in Settings.
+    *   Settings are stored in the SQLite `settings` table.
+    *   If active, Siftarr calls Radarr/Sonarr file deletion APIs before updating profiles and initiating searches.
 
 ---
 

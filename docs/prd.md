@@ -20,9 +20,12 @@ The MVP establishes a stable curation loop for Movies, integrating Radarr and Ta
     *   **Upgrade to BluRay**: Swipe Right or tap the BluRay button.
     *   **Upgrade to Remux**: Swipe Up or tap the Remux button.
     *   **Queue for Deletion**: Swipe Down or tap the Delete button.
+    *   **Keep / Skip as-is**: Tap the Skip/Keep button (checkmark icon) or use a neutral skip action to advance to the next card without making any modifications.
 *   **Safety Undo Buffer**: A 7-second undo window. When a curation action is taken, it is staged temporarily, and a floating toast with an `[ UNDO ]` button appears. The actual database/API updates are committed only after the 7-second buffer expires.
 *   **Deletion Queue**: A dedicated review screen listing all staged deletions. Items can be individually restored ("Keep") or deleted in bulk.
-*   **SQLite Settings Store**: Configuration for Radarr and Tautulli credentials, default profiles, and mapping tables are stored directly in the local SQLite database.
+*   **SQLite Settings Store**: Configuration for Radarr and Tautulli credentials, default profiles, mapping tables, and behavior flags are stored directly in the SQLite database. This includes user-toggleable checkboxes:
+    *   **Delete old file when upgrading**: If enabled, Siftarr deletes the active file from disk before triggering the *arr search command, forcing a clean download.
+    *   **Delete old file when downgrading**: If enabled, Siftarr deletes the active file from disk before triggering the *arr search command, ensuring the *arr instance grabs a lower-quality release immediately.
 
 ---
 
