@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Siftarr - Discovery Mode</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&amp;family=Outfit:wght@500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "outline-variant": "#3b4b37",
+                        "on-tertiary-fixed-variant": "#394857",
+                        "on-secondary-fixed-variant": "#544600",
+                        "inverse-on-surface": "#283326",
+                        "tertiary-container": "#cedef0",
+                        "primary-container": "#00ff41",
+                        "on-tertiary-fixed": "#0d1d2a",
+                        "surface-bright": "#313c2e",
+                        "on-secondary-container": "#725f00",
+                        "on-surface": "#dae6d2",
+                        "tertiary-fixed-dim": "#b8c8da",
+                        "on-tertiary": "#223240",
+                        "secondary-container": "#ffdb3c",
+                        "surface-container-lowest": "#071106",
+                        "on-tertiary-container": "#526271",
+                        "outline": "#84967e",
+                        "surface-container-low": "#141e12",
+                        "on-surface-variant": "#b9ccb2",
+                        "on-background": "#dae6d2",
+                        "secondary": "#fff9ef",
+                        "primary-fixed-dim": "#00e639",
+                        "on-primary-fixed-variant": "#00530e",
+                        "inverse-primary": "#006e16",
+                        "surface-container-high": "#222d20",
+                        "surface-dim": "#0c160a",
+                        "on-primary-fixed": "#002203",
+                        "tertiary": "#f6f9ff",
+                        "surface-container": "#182216",
+                        "on-primary-container": "#007117",
+                        "surface-tint": "#00e639",
+                        "background": "#0c160a",
+                        "error-container": "#93000a",
+                        "secondary-fixed-dim": "#e9c400",
+                        "on-secondary": "#3a3000",
+                        "on-primary": "#003907",
+                        "tertiary-fixed": "#d4e4f6",
+                        "error": "#ffb4ab",
+                        "surface": "#0c160a",
+                        "inverse-surface": "#dae6d2",
+                        "surface-container-highest": "#2d382a",
+                        "primary-fixed": "#72ff70",
+                        "primary": "#ebffe2",
+                        "on-error": "#690005",
+                        "secondary-fixed": "#ffe16d",
+                        "on-error-container": "#ffdad6",
+                        "surface-variant": "#2d382a",
+                        "on-secondary-fixed": "#221b00"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "stack-sm": "8px",
+                        "unit": "4px",
+                        "stack-md": "16px",
+                        "gutter": "16px",
+                        "margin-mobile": "20px",
+                        "margin-desktop": "40px",
+                        "stack-lg": "32px"
+                    },
+                    "fontFamily": {
+                        "title-md": ["Outfit"],
+                        "label-caps": ["Inter"],
+                        "headline-lg": ["Outfit"],
+                        "body-sm": ["Inter"],
+                        "headline-lg-mobile": ["Outfit"],
+                        "display-lg": ["Outfit"],
+                        "body-lg": ["Inter"]
+                    },
+                    "fontSize": {
+                        "title-md": ["20px", { "lineHeight": "28px", "fontWeight": "500" }],
+                        "label-caps": ["12px", { "lineHeight": "16px", "letterSpacing": "0.08em", "fontWeight": "700" }],
+                        "headline-lg": ["32px", { "lineHeight": "40px", "fontWeight": "600" }],
+                        "body-sm": ["14px", { "lineHeight": "20px", "fontWeight": "400" }],
+                        "headline-lg-mobile": ["28px", { "lineHeight": "36px", "fontWeight": "600" }],
+                        "display-lg": ["48px", { "lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "body-lg": ["16px", { "lineHeight": "24px", "fontWeight": "400" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body {
+            background-color: #000000;
+        }
+        .glass-panel {
+            background: rgba(10, 10, 10, 0.6);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border: 0.5px solid rgba(255, 255, 255, 0.1);
+        }
+    </style>
+</head>
+<body class="text-on-background min-h-screen flex flex-col font-body-sm text-body-sm pb-24 md:pb-0">
+<!-- TopAppBar -->
+<header class="fixed top-0 w-full z-50 bg-[#0a0a0a]/60 backdrop-blur-xl border-b border-white/10 shadow-2xl flex items-center justify-between px-margin-mobile h-16 md:hidden">
+<div aria-label="User profile avatar" class="leading-avatar w-8 h-8 rounded-full overflow-hidden bg-surface-variant flex items-center justify-center">
+<span aria-hidden="true" class="material-symbols-outlined text-on-surface-variant" data-icon="account_circle">account_circle</span>
+</div>
+<div class="text-center">
+<h1 class="font-headline-lg-mobile text-headline-lg-mobile font-display-lg text-display-lg tracking-tighter text-primary drop-shadow-[0_0_8px_rgba(0,255,65,0.5)]">
+<img alt="SIFTARR logo" class="h-8 object-contain" src="https://lh3.googleusercontent.com/aida/AP1WRLtLPx9VKIQHyae2sTqQcGc5a9IyuxdMjqHcKLuVj1PCsUc26yEeMJXL7qSoM3_tTHK1gYf2RRVewdBXF0NAe9Pf82Z9YH6rm5V2Te0H0GNTe0jxI-GMe49GHEeTv3w67iIRlogBRR68YDEUWVIgzBAbY-v-a5atBKiZ7aYO2gdPfnV2kubKEZ5k_YR5IibCbD6Eev57e62S98kdFpCUn_ZuMJljf2qeGLenp27YCCnz6-iug9CFrHKz7uo"/>
+</h1>
+</div>
+<button aria-label="Settings" class="trailing-icon text-primary hover:opacity-80 transition-opacity active:scale-95 transition-transform">
+<span aria-hidden="true" class="material-symbols-outlined" data-icon="tune">tune</span>
+</button>
+</header>
+<!-- Desktop Nav Cluster (Hidden on Mobile) -->
+<header class="hidden md:flex fixed top-0 w-full z-50 bg-[#0a0a0a]/60 backdrop-blur-xl shadow-2xl items-center justify-between px-margin-desktop h-20">
+<div class="flex items-center gap-6">
+<h1 class="font-display-lg text-display-lg tracking-tighter text-primary drop-shadow-[0_0_8px_rgba(0,255,65,0.5)]">
+<img alt="SIFTARR logo" class="h-10 object-contain" src="https://lh3.googleusercontent.com/aida/AP1WRLtLPx9VKIQHyae2sTqQcGc5a9IyuxdMjqHcKLuVj1PCsUc26yEeMJXL7qSoM3_tTHK1gYf2RRVewdBXF0NAe9Pf82Z9YH6rm5V2Te0H0GNTe0jxI-GMe49GHEeTv3w67iIRlogBRR68YDEUWVIgzBAbY-v-a5atBKiZ7aYO2gdPfnV2kubKEZ5k_YR5IibCbD6Eev57e62S98kdFpCUn_ZuMJljf2qeGLenp27YCCnz6-iug9CFrHKz7uo"/>
+</h1>
+<nav class="flex gap-6 font-label-caps text-label-caps">
+<a class="text-primary drop-shadow-[0_0_5px_rgba(0,255,65,0.8)] flex items-center gap-2 hover:opacity-80 transition-opacity active:scale-95 transition-transform" href="#">
+<span class="material-symbols-outlined" data-icon="explore">explore</span>
+                     Discovery
+                 </a>
+<a class="text-on-surface-variant flex items-center gap-2 hover:opacity-80 transition-opacity active:scale-95 transition-transform" href="#">
+<span class="material-symbols-outlined" data-icon="dashboard_customize">dashboard_customize</span>
+                     Manage
+                 </a>
+<a class="text-on-surface-variant flex items-center gap-2 relative hover:opacity-80 transition-opacity active:scale-95 transition-transform" href="#">
+<span class="material-symbols-outlined" data-icon="delete_sweep">delete_sweep</span>
+                     Queue
+                     <span class="absolute -top-2 -right-3 bg-error text-on-error rounded-full w-4 h-4 flex items-center justify-center text-[10px] font-bold">3</span>
+</a>
+</nav>
+</div>
+<div class="flex items-center gap-4">
+<button aria-label="Settings" class="trailing-icon text-on-surface-variant hover:opacity-80 transition-opacity active:scale-95 transition-transform">
+<span aria-hidden="true" class="material-symbols-outlined" data-icon="settings">settings</span>
+</button>
+<div aria-label="User profile avatar" class="leading-avatar w-10 h-10 rounded-full overflow-hidden bg-surface-variant flex items-center justify-center">
+<span aria-hidden="true" class="material-symbols-outlined text-on-surface-variant" data-icon="account_circle">account_circle</span>
+</div>
+</div>
+</header>
+<!-- Main Content Area -->
+<main class="flex-grow flex flex-col items-center justify-center pt-20 px-margin-mobile md:pt-28 md:px-margin-desktop w-full max-w-lg mx-auto">
+<!-- Segmented Toggle -->
+<div class="w-full glass-panel rounded-full p-1 flex mb-stack-lg shadow-[0_20px_40px_rgba(0,0,0,0.8)] relative overflow-hidden z-10">
+<button class="flex-1 py-2 text-center rounded-full bg-primary-container text-on-primary-container font-label-caps text-label-caps transition-all duration-300 relative z-10 drop-shadow-[0_0_8px_rgba(0,255,65,0.4)]">
+                Movies
+            </button>
+<button class="flex-1 py-2 text-center rounded-full text-on-surface-variant font-label-caps text-label-caps transition-all duration-300 hover:text-on-surface relative z-10">
+                TV Shows
+            </button>
+</div>
+<!-- Discovery Card Stack -->
+<div class="relative w-full aspect-[2/3] max-w-[340px] md:max-w-[420px] rounded-[24px] overflow-hidden shadow-[0_20px_40px_rgba(0,0,0,0.8)] border border-white/10 group cursor-pointer touch-pan-y">
+<!-- Background Image -->
+<div class="absolute inset-0 bg-cover bg-center transition-transform duration-700 ease-out group-hover:scale-105" data-alt="Cinematic movie poster for Interstellar featuring a deep space atmosphere with a black hole and spaceship. The lighting is dramatic and moody, employing a dark mode OLED aesthetic with deep blacks and subtle glowing highlights. The visual style is premium high-resolution photography suitable for a futuristic sci-fi media discovery interface." style="background-image: url('https://lh3.googleusercontent.com/aida/AP1WRLu7tAorSr58Emw1Cf4ozUkQUkxGOKoQXKvDzX65p62YG9VrwKBTI4WXcZ1XQRytHj1pgqFmk4tpVKHax0xbWrYqKVEezy5YZ2s96tluvcCZkQi7Caz4Oyg6doOX8PnuQGReLOjWwhAeBzEe9lrlqFnuDfkf84priJa_2zQE7_WixGZSFXjHPdzSZK9-7EZFamQrmOY5TJ2PdEpgvJ2OR-s0OwXrd9y22gbXWsNhuSmeMR43kUX066fe85I');">
+</div>
+<!-- Vignette gradient -->
+<div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
+<!-- Card Content Panel (Glassmorphic) -->
+<div class="absolute bottom-0 w-full glass-panel p-stack-md rounded-b-[24px]">
+<div class="flex justify-between items-end mb-unit">
+<div>
+<h2 class="font-title-md text-title-md text-primary mb-1">Interstellar</h2>
+<div class="flex items-center gap-2 text-on-surface-variant font-body-sm text-body-sm opacity-80">
+<span>2014</span>
+<span class="w-1 h-1 rounded-full bg-on-surface-variant opacity-50"></span>
+<span>169m</span>
+</div>
+</div>
+<div class="flex items-center gap-1 glass-panel px-2 py-1 rounded-lg border-primary/30">
+<span class="material-symbols-outlined text-secondary-container text-sm" data-icon="star" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="font-label-caps text-label-caps text-on-surface">8.6</span>
+</div>
+</div>
+<div class="flex flex-wrap gap-2 mt-stack-sm">
+<span class="px-2 py-1 rounded-md glass-panel font-label-caps text-label-caps text-on-surface-variant text-[10px]">Sci-Fi</span>
+<span class="px-2 py-1 rounded-md glass-panel font-label-caps text-label-caps text-on-surface-variant text-[10px]">Adventure</span>
+</div>
+</div>
+</div>
+<!-- Action Buttons -->
+<div class="flex justify-center items-center gap-stack-lg mt-stack-lg mb-stack-md z-10 w-full max-w-[340px]">
+<!-- Skip -->
+<button class="w-14 h-14 rounded-full glass-panel flex items-center justify-center border-outline-variant text-on-surface-variant hover:bg-surface-variant transition-colors active:scale-90 shadow-[0_10px_20px_rgba(0,0,0,0.5)]">
+<span class="material-symbols-outlined text-[28px]" data-icon="close">close</span>
+</button>
+<!-- Like -->
+<button class="w-16 h-16 rounded-full glass-panel flex items-center justify-center border-primary-container text-primary-container hover:bg-primary-container/10 transition-colors active:scale-90 shadow-[0_10px_30px_rgba(0,255,65,0.2)] drop-shadow-[0_0_8px_rgba(0,255,65,0.5)] relative overflow-hidden group">
+<div class="absolute inset-0 bg-primary-container/20 scale-0 group-active:scale-150 transition-transform duration-300 rounded-full"></div>
+<span class="material-symbols-outlined text-[32px] relative z-10" data-icon="favorite">favorite</span>
+</button>
+<!-- Super Like -->
+<button class="w-14 h-14 rounded-full glass-panel flex items-center justify-center border-secondary-container text-secondary-container hover:bg-secondary-container/10 transition-colors active:scale-90 shadow-[0_10px_20px_rgba(255,219,60,0.1)]">
+<span class="material-symbols-outlined text-[24px]" data-icon="star">star</span>
+</button>
+</div>
+</main>
+<!-- BottomNavBar -->
+<nav class="fixed bottom-0 w-full z-50 bg-[#0a0a0a]/60 backdrop-blur-xl border-t border-white/10 shadow-[0_-10px_40px_rgba(0,0,0,0.8)] flex justify-around items-center h-20 pb-safe px-4 md:hidden">
+<a class="flex flex-col items-center justify-center text-primary drop-shadow-[0_0_5px_rgba(0,255,65,0.8)] active:scale-90 transition-all duration-200" href="#">
+<span class="material-symbols-outlined mb-1" data-icon="explore" style="font-variation-settings: 'FILL' 1;">explore</span>
+<span class="font-label-caps text-label-caps text-[10px]">Discovery</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant/50 hover:text-primary/80 active:scale-90 transition-all duration-200" href="#">
+<span class="material-symbols-outlined mb-1" data-icon="dashboard_customize">dashboard_customize</span>
+<span class="font-label-caps text-label-caps text-[10px]">Manage</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant/50 hover:text-primary/80 active:scale-90 transition-all duration-200 relative" href="#">
+<span class="material-symbols-outlined mb-1" data-icon="delete_sweep">delete_sweep</span>
+<span class="font-label-caps text-label-caps text-[10px]">Queue</span>
+<span class="absolute top-0 right-1 bg-error text-on-error rounded-full w-4 h-4 flex items-center justify-center text-[10px] font-bold border border-black translate-x-1/2 -translate-y-1/2">3</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant/50 hover:text-primary/80 active:scale-90 transition-all duration-200" href="#">
+<span class="material-symbols-outlined mb-1" data-icon="settings">settings</span>
+<span class="font-label-caps text-label-caps text-[10px]">Settings</span>
+</a>
+</nav>
+<script>
+        // Simple card tilt effect for extra polish
+        const card = document.querySelector('.group');
+        if (card) {
+            card.addEventListener('mousemove', (e) => {
+                const rect = card.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                
+                const centerX = rect.width / 2;
+                const centerY = rect.height / 2;
+                
+                const rotateX = ((y - centerY) / centerY) * -5;
+                const rotateY = ((x - centerX) / centerX) * 5;
+                
+                card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.02, 1.02, 1.02)`;
+            });
+            
+            card.addEventListener('mouseleave', () => {
+                card.style.transform = 'perspective(1000px) rotateX(0) rotateY(0) scale3d(1, 1, 1)';
+            });
+        }
+    </script>
+</body></html>
