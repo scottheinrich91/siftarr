@@ -57,14 +57,15 @@ This backlog lists the user stories and acceptance criteria required to build Si
     *   Logs the TMDB ID and media type into the `skipped_items` database table.
     *   Applies a -0.5 weight to corresponding genres and creators.
 
-### User Story 2.4: Swiping Up to Add High-Quality (Super Like)
-*   **As a** user,
-*   **I want to** swipe up on a discovery card,
-*   **So that** it is added to Radarr/Sonarr using my designated "God Tier" quality profile.
+### User Story 2.5: Keyboard Curation (Discovery Mode)
+*   **As a** desktop user,
+*   **I want to** control swiping actions using my keyboard,
+*   **So that** I can rapidly curate media without using touch or mouse drag gestures.
 *   **Acceptance Criteria**:
-    *   Visual badge overlay "GOD TIER" appears when dragged upwards.
-    *   Triggers backend to add the media with the mapped premium profile.
-    *   Applies a +2.0 weight increase to corresponding genres/creators.
+    *   Pressing `Right Arrow` or `D` triggers "Like" (Swipe Right).
+    *   Pressing `Left Arrow` or `A` triggers "Skip" (Swipe Left).
+    *   Pressing `Up Arrow` or `W` triggers "God Tier" (Swipe Up).
+    *   Triggers card tilt-and-fly animations in the corresponding direction.
 
 ---
 
@@ -91,14 +92,16 @@ This backlog lists the user stories and acceptance criteria required to build Si
     *   God Tier (Up) maps to the highest profile and sends the update command.
     *   Triggers a search command in Radarr (`MoviesSearch`) or Sonarr (`SeriesSearch`).
 
-### User Story 3.3: Swiping Down to Queue for Deletion
-*   **As a** user,
-*   **I want to** swipe down on a library card,
-*   **So that** the item is added to the Deletion Review Queue instead of being deleted instantly.
+### User Story 3.4: Keyboard Curation (Management Mode)
+*   **As a** desktop user,
+*   **I want to** trigger library curation swipes using my keyboard,
+*   **So that** I can manage my existing collection with high speed.
 *   **Acceptance Criteria**:
-    *   Visual badge overlay "DELETE" appears on downward drag.
-    *   The item is stored in the local `deletion_queue` table.
-    *   The card is removed from the active Management stack.
+    *   Pressing `Right Arrow` or `D` triggers "Really Good" quality upgrade.
+    *   Pressing `Left Arrow` or `A` triggers "Standard" quality upgrade.
+    *   Pressing `Up Arrow` or `W` triggers "God Tier" quality upgrade.
+    *   Pressing `Down Arrow` or `S` triggers "Queue for Deletion" (Swipe Down).
+    *   Triggers the same card animation physics as the respective drag gesture.
 
 ---
 

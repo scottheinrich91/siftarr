@@ -28,6 +28,10 @@ This document establishes the UI/UX design specifications, colors, and page layo
 
 ## 2. Page Layout & Component Specifications
 
+### 2.0. Mobile-First Layout
+*   **Viewport Wrapper**: Siftarr is designed primarily as a mobile application. On desktop screens, the app is rendered inside a centered mobile viewport container (`max-width: 480px; height: 100vh; border-left: 1px solid rgba(255, 255, 255, 0.08); border-right: 1px solid rgba(255, 255, 255, 0.08);`).
+*   **Touch Gestures**: Full mobile touch gesture support (drag to swipe) with tactile vibrations and spring-back mechanics.
+
 ### 2.1. Header & Navigation Component
 *   **Logo/Title**: "SIFTARR" styled with text-shadow neon green glow.
 *   **Global Library Picker**:
@@ -40,9 +44,9 @@ This document establishes the UI/UX design specifications, colors, and page layo
     *   **Settings**: To configure URLs and API keys.
 
 ### 2.2. Card Stack Component (Discovery & Management Feed)
-*   **Container**: Vertical stack centered in the viewport.
+*   **Container**: Vertical stack centered in the mobile viewport.
 *   **Media Card**:
-    *   Aspect ratio: `350px` width by `500px` height.
+    *   Aspect ratio: Fits neatly inside the mobile wrapper (typically `340px` width by `480px` height).
     *   Poster image: Fills the entire background of the card.
     *   **Glass Detail Panel (Bottom)**: Layered on top of the poster containing:
         *   Media Title & Release Year.
@@ -54,7 +58,15 @@ This document establishes the UI/UX design specifications, colors, and page layo
         *   Dragging Up: "GOD TIER" (Neon Gold)
         *   Dragging Down: "DELETE" (Crimson Red)
 
-### 2.3. Deletion Safety Queue Layout
+### 2.3. Keyboard Controls (Desktop Mode)
+To support high-speed curation on desktop viewports, Siftarr intercepts keydown events on the card stack:
+*   **Swipe Right / Like / Upgrade (Really Good)**: `Right Arrow` or `D` key.
+*   **Swipe Left / Skip / Keep (Standard)**: `Left Arrow` or `A` key.
+*   **Swipe Up / Super Like / Upgrade (God Tier)**: `Up Arrow` or `W` key.
+*   **Swipe Down / Delete**: `Down Arrow` or `S` key.
+*   *Keypress Feedback*: Pressing a key triggers a visual card animation (tilting and flying off-screen in the corresponding direction) mimicking the mouse/touch swipe gesture.
+
+### 2.4. Deletion Safety Queue Layout
 *   **Header Stats**: Displays total count of items and estimated reclaimed disk space (e.g., "Total Space Reclaimed: 154.2 GB") in neon red.
 *   **Queue Table**: Rows with glassmorphic background:
     *   Cover Thumbnail.
@@ -62,7 +74,7 @@ This document establishes the UI/UX design specifications, colors, and page layo
     *   Action Buttons: "Keep" (neutral slate) and "Delete" (crimson outline).
 *   **Action Bar**: "Cancel All" and "Confirm All Deletions" (glowing solid red button).
 
-### 2.4. Settings Layout
+### 2.5. Settings Layout
 *   **API Configuration Form**: Input fields for Radarr, Sonarr, and TMDB credentials with individual "Test Connection" indicators.
 *   **Profile Mapping Section**:
     *   Movies (Radarr) column and TV Shows (Sonarr) column.
