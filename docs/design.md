@@ -7,8 +7,8 @@ This document establishes the UI/UX design specifications, colors, and page layo
 ## 1. Global Visual Tokens
 
 ### 1.1. Color System
-*   **Base Background**: Pitch black `#020203` to dark charcoal `#0a0b0d`.
-*   **Card Fill**: Semi-transparent charcoal `rgba(20, 22, 29, 0.65)`.
+*   **Base Background**: True OLED Black `#000000` (pure black).
+*   **Card Fill**: Semi-transparent charcoal `rgba(10, 10, 10, 0.6)`.
 *   **Borders**: Soft translucent white border `1px solid rgba(255, 255, 255, 0.08)`.
 *   **Neon Highlight Accents**:
     *   **Like / Right Swipe**: Neon Green `#00e676` (shadow: `0 0 12px rgba(0, 230, 118, 0.4)`).
