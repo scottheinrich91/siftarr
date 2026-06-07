@@ -35,7 +35,8 @@ This backlog lists the user stories and acceptance criteria required to build Si
 *   **So that** I can explore new media to add.
 *   **Acceptance Criteria**:
     *   Shows cover poster, title, year, rating, and genres.
-    *   Items already existing in Radarr/Sonarr are automatically omitted.
+    *   The discovery feed dynamically maps to the active Library Profile's media type (`movie` -> TMDB Movies/Radarr, `tv` -> TMDB TV/Sonarr).
+    *   Items already existing in the corresponding *arr library matching the configured root folder are automatically filtered out.
     *   Items previously skipped (Left-swiped) are omitted.
     *   Feed is sorted by local recommendation taste weights (highest match first).
 

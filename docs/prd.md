@@ -22,8 +22,9 @@ Siftarr is a gamified, self-hosted web application for the *arr suite (specifica
 ### 2.1. Discovery Mode (Tab 1 - Default)
 * **Objective**: Browse media not in the user's library and add them to Radarr or Sonarr.
 * **Card Feed**:
-  * **Movies**: Pulled from TMDB (trending, popular, similar, genres). Filters out movies already present in the Radarr library.
-  * **TV Shows**: Pulled from TMDB (popular/trending TV shows, genre lists). Filters out TV shows already in the Sonarr library.
+  * **Source Resolution**: The discovery feed adapts dynamically to the active Library Profile type:
+    * For **Movie-type Library Profiles** (e.g. "Kids Movies", "Documentaries"), Siftarr pulls recommendations from TMDB Movie endpoints (popular, trending, genre lists). It filters out movies already present in the Radarr library (matching the configured root folder path for that library).
+    * For **TV-type Library Profiles** (e.g. "TV Shows"), Siftarr pulls recommendations from TMDB TV Show endpoints. It filters out series already present in the Sonarr library.
 * **Swipe Actions**:
   * **Swipe Right (Like)**: Sends the item to Radarr/Sonarr to add and start downloading. Uses the default Discovery profile configured in Settings.
   * **Swipe Left (Skip/Dislike)**: Skips the item. The item ID is logged to a local database skip list so it won't appear again.

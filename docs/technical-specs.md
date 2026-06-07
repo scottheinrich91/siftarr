@@ -181,9 +181,12 @@ If configured in Siftarr's settings, Siftarr queries Tautulli to retrieve watch 
 ### 4.5. Dynamic Service Lifecycle & Library Filtering
 Siftarr is built to run with either or both *arr services configured and supports multiple library profiles.
 *   **Initialization**: The configuration module validates credentials on startup. Active integrations are flagged (`isRadarrEnabled`, `isSonarrEnabled`, `isTautulliEnabled`).
-*   **Active Library Root Path Filtering**:
+*   **Active Library Root Path Filtering & Recommendation Feeds**:
     *   When the client queries items for an active Library Profile, the backend fetches all items from Radarr or Sonarr.
     *   If the profile defines `root_folder` (e.g. `/data/media/kids-movies/`), the backend filters the list to include only movies/shows whose file paths or series folders are subdirectories of that root path.
+    *   For the Discovery feed, the backend reads the `media_type` of the active Library Profile:
+        *   If `movie`, Siftarr queries TMDB Movie endpoints (e.g., `/3/movie/popular`, `/3/trending/movie/week`) and filters out items already present in the user's Radarr instance matching the profile's root path.
+        *   If `tv`, Siftarr queries TMDB TV Show endpoints (e.g., `/3/tv/popular`, `/3/trending/tv/week`) and filters out items already present in Sonarr.
 *   **API Layer Resilience**:
     *   Routes corresponding to disabled services (e.g. `/api/series` when `isSonarrEnabled` is false) return a structured `200 OK` response with `{ enabled: false, items: [] }` or a descriptive error rather than causing server crashes.
     *   Settings page connection tests operate independently. A failure to connect to Sonarr will not prevent Radarr or Tautulli settings from being tested or saved successfully.
