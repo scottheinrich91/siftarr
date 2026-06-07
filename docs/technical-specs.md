@@ -53,6 +53,18 @@ src/
     cors:
       allowed_origins:
         - "http://localhost:5173"
+    radarr:
+      url: "http://localhost:7878"
+      api_key: "your_radarr_api_key_here"
+      enabled: true
+    sonarr:
+      url: "http://localhost:8989"
+      api_key: "your_sonarr_api_key_here"
+      enabled: false # Can be disabled or omitted
+    tautulli:
+      url: "http://localhost:8181"
+      api_key: "your_tautulli_api_key_here"
+      enabled: true # Optional integration
     ```
 
 ---
@@ -137,6 +149,29 @@ CREATE TABLE deletion_queue (
 *   `GET /3/trending/{movie|tv}/week`
 *   `GET /3/{movie|tv}/popular`
 *   `GET /3/{movie|tv}/{id}?append_to_response=credits` (Fetches metadata for recommendation parsing).
+
+### 4.4. Tautulli API v2 (Optional)
+If configured in Siftarr's settings, Siftarr queries Tautulli to retrieve watch stats for items in the library.
+*   **Resolve Rating Key (Movies)**:
+    *   Query: `GET /api/v2?apikey={key}&cmd=get_library_media_info`
+    *   Parameters: `rating_key` matches are verified by searching for matching TMDB ID (`tmdb_id`) or IMDb ID (`imdb_id`) in Tautulli's metadata.
+*   **Resolve Rating Key (TV Shows)**:
+    *   Query: `GET /api/v2?apikey={key}&cmd=get_library_media_info`
+    *   Parameters: Matches the Sonarr series TVDB ID (`tvdb_id`) or IMDb ID (`imdb_id`) to the Tautulli library rating key.
+*   **Retrieve Watch Stats**:
+    *   Query: `GET /api/v2?apikey={key}&cmd=get_item_watch_time_stats&rating_key={rating_key}`
+    *   Response yields:
+        *   `play_count`: Total watch count (Integer). For TV shows, represents cumulative play count across all episodes in the series.
+        *   `last_played`: Timestamp of last play activity (String/Epoch). For TV shows, represents the last played timestamp of any episode in the series.
+        *   `total_watch_time`: Cumulative watch duration in seconds (Integer).
+
+### 4.5. Dynamic Service Lifecycle & Error Handling
+Siftarr is built to run with either or both *arr services configured.
+*   **Initialization**: The configuration module validates credentials on startup. Active integrations are flagged (`isRadarrEnabled`, `isSonarrEnabled`, `isTautulliEnabled`).
+*   **API Layer Resilience**:
+    *   Routes corresponding to disabled services (e.g. `/api/series` when `isSonarrEnabled` is false) return a structured `200 OK` response with `{ enabled: false, items: [] }` or a descriptive error rather than causing server crashes.
+    *   Settings page connection tests operate independently. A failure to connect to Sonarr will not prevent Radarr or Tautulli settings from being tested or saved successfully.
+    *   The frontend queries `/api/status` on load to learn which services are enabled, dynamically adapting the interface.
 
 ---
 

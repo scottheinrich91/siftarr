@@ -14,6 +14,7 @@ Siftarr is a gamified, self-hosted web application for the *arr suite (specifica
   * Switching the Library Picker alters the data source:
     * **Movies Mode**: Configures feeds, swipes, settings, and deletion queues to point to Radarr and TMDB Movie endpoints.
     * **TV Shows Mode**: Configures feeds, swipes, settings, and deletion queues to point to Sonarr and TMDB TV Show endpoints.
+  * **Independent Service Execution**: If only one service (Radarr or Sonarr) is configured in Settings, the Library Picker is hidden or locked to the configured service. Siftarr runs in single-service mode, defaulting all operations to the configured application without requiring both services to be active.
 
 ### 2.1. Discovery Mode (Tab 1 - Default)
 * **Objective**: Browse media not in the user's library and add them to Radarr or Sonarr.
@@ -32,8 +33,8 @@ Siftarr is a gamified, self-hosted web application for the *arr suite (specifica
 ### 2.2. Management Mode (Tab 2)
 * **Objective**: Curate existing library items, upgrading or downgrading files by mapping swipes directly to quality tiers.
 * **Card Feed**:
-  * **Movies**: Displays movies currently in the Radarr library. Cards show active file metadata: Resolution, File Size, and Source (e.g. WEBDL, BluRay, REMUX, HDTV).
-  * **TV Shows**: Displays TV series currently in the Sonarr library. Cards show series-level metadata: Number of Seasons/Episodes Downloaded vs. Total, Total Folder Size, current Quality Profile, and dominant file source (e.g., WEBDL, BluRay, HDTV).
+  * **Movies**: Displays movies currently in the Radarr library. Cards show active file metadata (Resolution, File Size, Source like REMUX, BluRay, WEBDL, HDTV) and Tautulli usage stats (Play Count, Last Played, and Cumulative Watch Time) if Tautulli is configured. These stats drive user decisions (e.g. deleting unwatched movies, keeping highly played ones, or upgrading/downgrading quality profiles).
+  * **TV Shows**: Displays TV series currently in the Sonarr library. Cards show series-level metadata (Episodes Downloaded vs. Total, Total Folder Size, Current Quality Profile, dominant file source) and Tautulli usage stats (Total series play count, last played date of any episode, and cumulative series watch time) if configured.
 * **Swipe Actions**:
   * **Swipe Left (Standard / WebDL)**: Maps the item's Radarr/Sonarr profile to a standard WEB-DL/WebDL quality profile (saving space if it was a larger BluRay/REMUX) and triggers search.
   * **Swipe Right (High Quality / BluRay)**: Maps the profile to a BluRay quality profile (upgrading if it was WEBDL/HDTV) and triggers search.
@@ -52,12 +53,14 @@ Siftarr is a gamified, self-hosted web application for the *arr suite (specifica
 ### 2.4. Settings (Tab 4)
 * **Objective**: Configure credentials and app behavior.
 * **Settings Fields**:
-  * **Radarr URL** & **Radarr API Key**
-  * **Sonarr URL** & **Sonarr API Key**
+  * **Radarr URL** & **Radarr API Key** (optional if Sonarr is configured)
+  * **Sonarr URL** & **Sonarr API Key** (optional if Radarr is configured)
+  * **Tautulli URL** & **Tautulli API Key** (optional, for viewing usage statistics to drive curation)
   * **TMDB API Key** (for fetching discovery lists)
   * **Profile Mappings**: Match Siftarr's swipe directions (Standard, Really Good, God Tier) to actual Quality Profiles fetched dynamically from Radarr and Sonarr.
   * **Default Discovery Profiles**: The Radarr/Sonarr profile used when swiping right in Discovery Mode.
   * **Reset Data**: Option to wipe recommendation weights, skipped lists, and database.
+  * **Independent Service Verification**: Individual "Test Connection" buttons for Radarr, Sonarr, and Tautulli. The app validates only the configured services and handles unconfigured services gracefully.
 
 ---
 

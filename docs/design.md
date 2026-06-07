@@ -37,6 +37,7 @@ This document establishes the UI/UX design specifications, colors, and page layo
 *   **Global Library Picker**:
     *   Segmented selector: "Movies" vs. "TV Shows".
     *   Has a smooth background sliding transition to highlight the selected library context.
+    *   **Dynamic Visibility**: If only one service is configured, the segmented selector is replaced by a static, non-interactive glass badge in the header displaying the active library context (e.g. "Movies Only" or "TV Shows Only").
 *   **Navigation Tabs**: Text links for:
     *   **Discovery**: Active by default.
     *   **Management**: For library curation.
@@ -52,6 +53,11 @@ This document establishes the UI/UX design specifications, colors, and page layo
         *   Media Title & Release Year.
         *   Metadata tags (Genre badges, Rating, Runtime).
         *   *Management Status overlays*: Displays active quality details: Resolution (e.g., `2160p`), Folder Size (e.g., `45.8 GB`), and Source (e.g., `REMUX`, `BluRay`, `WEBDL`, `HDTV`).
+        *   *Tautulli Statistics Overlay*: When Tautulli is active, a secondary translucent horizontal bar shows play details:
+            *   Play Count: displayed with a play icon (e.g., `▶ 14 plays`).
+            *   Last Played: displayed with a clock icon (e.g., `🕒 3 weeks ago` or `Never`).
+            *   Watch Time: displayed with a duration icon (e.g., `⌛ 28.5 hrs`).
+            *   *Curation Indicator*: A color-coded boundary glow is added to the Tautulli stats. If the item has `0 plays` and has been in the library for over 30 days, the stats label displays in desaturated red, identifying it as a candidate for deletion. If it has high play counts (e.g., `> 10 plays`), it gets a subtle gold accent indicating high usage.
     *   **Swipe Overlay Badges**: Text overlays centered on the card that fade in relative to drag direction and offset distance:
         *   Discovery Mode: Dragging Right is "LIKE" (Neon Green), Dragging Left is "SKIP" (Slate), Dragging Up is "GOD TIER" (Gold).
         *   Management Mode: Dragging Right is "BLURAY" (Royal Violet), Dragging Left is "WEBDL" (Electric Blue), Dragging Up is "REMUX" (Gold), Dragging Down is "DELETE" (Crimson Red).
@@ -73,8 +79,12 @@ To support high-speed curation on desktop viewports, Siftarr intercepts keydown 
 *   **Action Bar**: "Cancel All" and "Confirm All Deletions" (glowing solid red button).
 
 ### 2.5. Settings Layout
-*   **API Configuration Form**: Input fields for Radarr, Sonarr, and TMDB credentials with individual "Test Connection" indicators.
+*   **API Configuration Form**: Input fields for Radarr, Sonarr, TMDB, and Tautulli credentials.
+    *   **Tautulli Fields**: URL, API Key, and a toggle switch to enable/disable the Plex statistics integration.
+    *   **Test Connection Feedback**: Clicking "Test Connection" adjacent to any credentials updates a status indicator: pulsing green for successful handshake, pulsing yellow for unconfigured/ignored, and pulsing red with a hover tooltip showing the error details on connection failure.
+    *   **Dynamic Validation**: Users can save configurations with either Radarr or Sonarr left blank. If saved empty, the application marks the service as inactive, disabling the respective section of the app.
 *   **Profile Mapping Section**:
-    *   Movies (Radarr) column and TV Shows (Sonarr) column.
+    *   Separate panels for Movies (Radarr) and TV Shows (Sonarr).
+    *   If a service is inactive, its profile mapping panel is dimmed with an overlay: "Configure [Service Name] in API settings to enable mappings."
     *   Action mapping dropdowns (Standard, Really Good, God Tier) linked to fetched quality profiles.
     *   Default profiles configuration for new items.

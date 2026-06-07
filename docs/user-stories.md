@@ -112,6 +112,15 @@ This backlog lists the user stories and acceptance criteria required to build Si
     *   Pressing `Down Arrow` or `S` triggers "Queue for Deletion" (Swipe Down).
     *   Triggers the same card animation physics as the respective drag gesture.
 
+### User Story 3.5: Tautulli Curation Metrics on Card
+*   **As a** user,
+*   **I want to** see how many times and how recently a movie or TV show has been watched in my Plex library via Tautulli,
+*   **So that** I can make informed decisions to delete unused media, keep popular media, or upgrade active content.
+*   **Acceptance Criteria**:
+    *   Cards in Management Mode display play counts, last played timestamps, and watch time when Tautulli is enabled.
+    *   If an item has 0 plays and was added more than 30 days ago, a desaturated red warning indicator highlights it.
+    *   If Tautulli is not configured or disabled, the metrics overlay is hidden gracefully, and the card layout collapses nicely without any empty space.
+
 ---
 
 ## Epic 4: Deletion Safety Queue
@@ -154,3 +163,22 @@ This backlog lists the user stories and acceptance criteria required to build Si
     *   Dropdown pickers populated dynamically from Radarr/Sonarr APIs.
     *   Separate profile mapping configurations for Movies and TV Shows.
     *   Easily maps to custom profiles synchronized by Recyclarr.
+
+### User Story 5.3: Tautulli Integration Configuration
+*   **As a** user,
+*   **I want to** enter my Tautulli URL and API Key in the Settings tab,
+*   **So that** Siftarr can fetch and display Plex watch statistics for my media.
+*   **Acceptance Criteria**:
+    *   Tautulli URL and API Key input fields exist in Settings.
+    *   A toggle switch allows enabling/disabling the Tautulli integration.
+    *   A "Test Connection" button performs a handshake with Tautulli and shows a visual validation response.
+
+### User Story 5.4: Independent *arr Instance Configuration
+*   **As a** user,
+*   **I want to** configure only Radarr or only Sonarr in Settings,
+*   **So that** I can use Siftarr for just movies or just TV shows without configuring both.
+*   **Acceptance Criteria**:
+    *   Saving settings succeeds even if one of the URL/API Key pairs for Radarr or Sonarr is omitted or cleared.
+    *   The unconfigured service's tabs/features are disabled in the UI.
+    *   The header picker hides or locks to the single active service.
+    *   The backend runs normally and does not crash or log constant connection errors for the missing service.
