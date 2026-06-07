@@ -74,32 +74,41 @@ This backlog lists the user stories and acceptance criteria required to build Si
 ### User Story 3.1: Library Curation Feed
 *   **As a** user,
 *   **I want to** browse a stack of cards representing my existing media library,
-*   **So that** I can clean up files or upgrade their resolution.
+*   **So that** I can inspect files and decide to upgrade, downgrade, or delete them.
 *   **Acceptance Criteria**:
     *   Renders existing Radarr movies or Sonarr TV series.
     *   Shows a badge overlay indicating file details:
-        *   Movies: resolution, folder size, and TRaSH Guides Custom Format Tags (e.g. x265, HEVC, Atmos, HDR10, DV).
-        *   TV Shows: number of episodes downloaded vs. total episodes, total folder size, and current quality profile.
+        *   Movies: resolution, folder size, dominant source (e.g. REMUX, Bluray, WEBDL, HDTV), and TRaSH Guides Custom Format Tags (e.g. x265, HEVC, Atmos, HDR10, DV).
+        *   TV Shows: number of episodes downloaded vs. total episodes, total folder size, dominant source, and current quality profile.
         *   Displays the active Custom Format Score calculated by Radarr/Sonarr to easily verify TRaSH Guides alignment.
 
-### User Story 3.2: Upgrading Quality via Swiping
+### User Story 3.2: Upgrading and Downgrading Quality via Swiping
 *   **As a** user,
-*   **I want to** swipe a library card standard (Left), good (Right), or god-tier (Up),
-*   **So that** Siftarr updates the quality profile (which has custom format cutoff scores configured via Recyclarr or manually) in Radarr/Sonarr and triggers an automatic search.
+*   **I want to** swipe a library card standard (Left) or good (Right),
+*   **So that** I can either downgrade/keep the file to save disk space or upgrade it to a higher resolution.
 *   **Acceptance Criteria**:
-    *   Standard (Left) maps the item to the Standard profile and sends the update command.
-    *   Good (Right) maps to the Really Good profile and sends the update command.
-    *   God Tier (Up) maps to the highest profile and sends the update command.
-    *   Triggers a search command in Radarr (`MoviesSearch`) or Sonarr (`SeriesSearch`).
+    *   Swipe Left (Downgrade/Keep) changes the quality profile to a lower-tier profile (e.g. from REMUX to WEBDL) to save space, and triggers a search (or keeps standard).
+    *   Swipe Right (Upgrade) changes the profile to a higher-tier profile (e.g. from WEBDL to Bluray/REMUX) and triggers an automatic search.
+    *   Swipe Up (God Tier Upgrade) upgrades the profile directly to the premium/highest Remux profile and triggers search.
+    *   Triggers search commands in Radarr (`MoviesSearch`) or Sonarr (`SeriesSearch`).
+
+### User Story 3.3: Swiping Down to Queue for Deletion
+*   **As a** user,
+*   **I want to** swipe down on a library card,
+*   **So that** the item is added to the Deletion Review Queue instead of being deleted instantly.
+*   **Acceptance Criteria**:
+    *   Visual badge overlay "DELETE" appears on downward drag.
+    *   The item is stored in the local `deletion_queue` table.
+    *   The card is removed from the active Management stack.
 
 ### User Story 3.4: Keyboard Curation (Management Mode)
 *   **As a** desktop user,
 *   **I want to** trigger library curation swipes using my keyboard,
 *   **So that** I can manage my existing collection with high speed.
 *   **Acceptance Criteria**:
-    *   Pressing `Right Arrow` or `D` triggers "Really Good" quality upgrade.
-    *   Pressing `Left Arrow` or `A` triggers "Standard" quality upgrade.
-    *   Pressing `Up Arrow` or `W` triggers "God Tier" quality upgrade.
+    *   Pressing `Right Arrow` or `D` triggers "Upgrade" quality action.
+    *   Pressing `Left Arrow` or `A` triggers "Downgrade/Keep" quality action.
+    *   Pressing `Up Arrow` or `W` triggers "God Tier Upgrade" quality action.
     *   Pressing `Down Arrow` or `S` triggers "Queue for Deletion" (Swipe Down).
     *   Triggers the same card animation physics as the respective drag gesture.
 
