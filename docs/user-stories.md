@@ -15,14 +15,14 @@ This backlog lists the user stories and acceptance criteria required to build Si
     *   Active tab is visually highlighted.
     *   State is preserved where appropriate when switching tabs (e.g., current settings form input or deletion queue selections).
 
-### User Story 1.2: Overall Library Picker
-*   **As a** user,
-*   **I want** a global selector to switch between Movies and TV Shows,
-*   **So that** all discovery feeds, management lists, queue items, and settings are filtered to my active media context.
+### User Story 1.2: Dynamic Library Picker Dropdown
+*   **As a** user with multiple libraries (e.g. Movies, Kids Movies, Documentaries, TV Shows),
+*   **I want** a dropdown selector in the header to switch between my configured libraries,
+*   **So that** I can curate separate collections independently.
 *   **Acceptance Criteria**:
-    *   Rendered as a slide-selected segmented button or dropdown in the header.
-    *   Switching to "Movies" shifts active endpoints to Radarr/TMDB Movies.
-    *   Switching to "TV Shows" shifts active endpoints to Sonarr/TMDB TV.
+    *   Renders as a glassmorphic dropdown listing all active Library Profiles.
+    *   If only a single Library Profile is configured, the dropdown displays as a static, non-interactive badge.
+    *   Selecting a profile (e.g. "Kids Movies") filters card feeds to its specific media type and root folder path.
     *   The selector immediately updates the card deck of the active tab without requiring a page refresh.
 
 ---
@@ -182,3 +182,14 @@ This backlog lists the user stories and acceptance criteria required to build Si
     *   The unconfigured service's tabs/features are disabled in the UI.
     *   The header picker hides or locks to the single active service.
     *   The backend runs normally and does not crash or log constant connection errors for the missing service.
+
+### User Story 5.5: Managing Custom Library Profiles
+*   **As a** user,
+*   **I want to** add, edit, toggle, or delete library profiles in my Settings,
+*   **So that** I can customize Siftarr's library segments and map them to Plex/Tautulli and *arr subdirectories.
+*   **Acceptance Criteria**:
+    *   A "Library Profiles Manager" section is visible in the Settings tab.
+    *   An "Add Library" button opens a modal allowing input of Name, Media Type (Movies/TV), Root Folder Path, and Tautulli Section ID.
+    *   Fields like Root Folder Path and Tautulli Section ID display dropdowns populated dynamically from active service API queries.
+    *   Users can toggle a library profile off/on (inactive profiles are hidden from the header picker).
+    *   Profiles can be reordered by dragging, and deleted by clicking a delete icon.

@@ -8,13 +8,16 @@ Siftarr is a gamified, self-hosted web application for the *arr suite (specifica
 ## 2. Core Features
 
 ### 2.0. Library Picker
-* **Objective**: Define the active media library type (Movies vs. TV Shows).
+* **Objective**: Define the active media library (e.g. Movies, Kids Movies, Documentaries, TV Shows).
 * **Functionality**:
-  * A prominent, global toggle or dropdown (e.g., in the header/navbar) accessible from both the Discovery and Management tabs.
-  * Switching the Library Picker alters the data source:
-    * **Movies Mode**: Configures feeds, swipes, settings, and deletion queues to point to Radarr and TMDB Movie endpoints.
-    * **TV Shows Mode**: Configures feeds, swipes, settings, and deletion queues to point to Sonarr and TMDB TV Show endpoints.
-  * **Independent Service Execution**: If only one service (Radarr or Sonarr) is configured in Settings, the Library Picker is hidden or locked to the configured service. Siftarr runs in single-service mode, defaulting all operations to the configured application without requiring both services to be active.
+  * An expandable, glassmorphic dropdown selector accessible in the header/navbar on both the Discovery and Management tabs.
+  * Displays user-defined **Library Profiles** configured in Settings.
+  * Switching the active library updates all feeds, card decks, recommendation filters, and deletion queues:
+    * **Movie-type Library Profiles**: Points to Radarr (optionally filtered by a specific root folder path) and TMDB Movie endpoints.
+    * **TV-type Library Profiles**: Points to Sonarr (optionally filtered by a specific root folder path) and TMDB TV Show endpoints.
+  * **Dynamic Visibility**:
+    * If only a single Library Profile is defined and enabled in Settings, the Library Picker is hidden from the header to maximize screen space.
+    * If multiple Library Profiles are enabled, the picker is shown, allowing rapid switching between collections (even if all libraries map to the same backend service, e.g. multiple distinct Movie folders in a single Radarr instance).
 
 ### 2.1. Discovery Mode (Tab 1 - Default)
 * **Objective**: Browse media not in the user's library and add them to Radarr or Sonarr.
@@ -60,6 +63,7 @@ Siftarr is a gamified, self-hosted web application for the *arr suite (specifica
   * **Profile Mappings**: Match Siftarr's swipe directions (Standard, Really Good, God Tier) to actual Quality Profiles fetched dynamically from Radarr and Sonarr.
   * **Default Discovery Profiles**: The Radarr/Sonarr profile used when swiping right in Discovery Mode.
   * **Reset Data**: Option to wipe recommendation weights, skipped lists, and database.
+  * **Library Profiles Management**: Section to define custom Library Profiles. Users can add, edit, or delete libraries, naming them (e.g. "Kids Movies") and specifying their Type (Radarr/Sonarr), root folder filter, and associated Tautulli Plex Library Section ID.
   * **Independent Service Verification**: Individual "Test Connection" buttons for Radarr, Sonarr, and Tautulli. The app validates only the configured services and handles unconfigured services gracefully.
 
 ---

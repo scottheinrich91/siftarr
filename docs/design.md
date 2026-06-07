@@ -35,9 +35,10 @@ This document establishes the UI/UX design specifications, colors, and page layo
 ### 2.1. Header & Navigation Component
 *   **Logo/Title**: "SIFTARR" styled with text-shadow neon green glow.
 *   **Global Library Picker**:
-    *   Segmented selector: "Movies" vs. "TV Shows".
-    *   Has a smooth background sliding transition to highlight the selected library context.
-    *   **Dynamic Visibility**: If only one service is configured, the segmented selector is replaced by a static, non-interactive glass badge in the header displaying the active library context (e.g. "Movies Only" or "TV Shows Only").
+    *   **Dropdown Selector**: Renders as an expandable, glassmorphic dropdown list with a chevron icon (e.g. "Movies ▾").
+    *   **Content**: Shows all enabled Library Profiles (e.g., "Movies", "Kids Movies", "Documentaries", "Stand-up Comedy", "TV Shows").
+    *   **Interaction**: Tapping the active library name displays a dropdown list with glassmorphic blur and satin borders. Selecting an option triggers a smooth cards fade-out and slide-in reload of the newly selected library context.
+    *   **Dynamic Visibility**: If only a single Library Profile is defined and enabled, the dropdown collapses into a static, non-interactive glass badge displaying the library name to save screen real estate.
 *   **Navigation Tabs**: Text links for:
     *   **Discovery**: Active by default.
     *   **Management**: For library curation.
@@ -83,6 +84,14 @@ To support high-speed curation on desktop viewports, Siftarr intercepts keydown 
     *   **Tautulli Fields**: URL, API Key, and a toggle switch to enable/disable the Plex statistics integration.
     *   **Test Connection Feedback**: Clicking "Test Connection" adjacent to any credentials updates a status indicator: pulsing green for successful handshake, pulsing yellow for unconfigured/ignored, and pulsing red with a hover tooltip showing the error details on connection failure.
     *   **Dynamic Validation**: Users can save configurations with either Radarr or Sonarr left blank. If saved empty, the application marks the service as inactive, disabling the respective section of the app.
+*   **Library Profiles Manager**:
+    *   A list component displaying all configured Siftarr libraries with drag-and-drop handles for reordering.
+    *   An **Add Library** button that opens a glassmorphic modal with:
+        *   `Library Name` (e.g. "Kids Movies", "Stand-up Comedy")
+        *   `Media Type` (Movies/Sonarr TV toggle)
+        *   `Root Folder Path` (dropdown populated from fetched *arr instance folders, or custom input)
+        *   `Tautulli Section ID` (dropdown populated from fetched Plex libraries, or custom integer input)
+    *   Each row features an active toggle switch and a delete icon.
 *   **Profile Mapping Section**:
     *   Separate panels for Movies (Radarr) and TV Shows (Sonarr).
     *   If a service is inactive, its profile mapping panel is dimmed with an overlay: "Configure [Service Name] in API settings to enable mappings."

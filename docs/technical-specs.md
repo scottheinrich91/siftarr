@@ -91,7 +91,19 @@ Instead of managing dozens of individual resolutions, Siftarr maps swipes direct
 
 ## 3. Database Schema
 
-### 3.1. Table: `skipped_items`
+### 3.1. Table: `library_profiles`
+```sql
+CREATE TABLE library_profiles (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT NOT NULL UNIQUE,
+    media_type TEXT NOT NULL CHECK(media_type IN ('movie', 'tv')),
+    root_folder TEXT,              -- Optional path filter (e.g. '/data/media/kids-movies/')
+    tautulli_section_id INTEGER,   -- Optional Plex Library Section ID from Tautulli
+    is_enabled INTEGER DEFAULT 1
+);
+```
+
+### 3.2. Table: `skipped_items`
 ```sql
 CREATE TABLE skipped_items (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -102,7 +114,7 @@ CREATE TABLE skipped_items (
 );
 ```
 
-### 3.2. Table: `taste_profiles`
+### 3.3. Table: `taste_profiles`
 ```sql
 CREATE TABLE taste_profiles (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -114,7 +126,7 @@ CREATE TABLE taste_profiles (
 );
 ```
 
-### 3.3. Table: `deletion_queue`
+### 3.4. Table: `deletion_queue`
 ```sql
 CREATE TABLE deletion_queue (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -124,6 +136,7 @@ CREATE TABLE deletion_queue (
     year INTEGER NOT NULL,
     size_bytes INTEGER NOT NULL DEFAULT 0,
     path TEXT,
+    library_name TEXT,            -- Name of the Siftarr library this was queued from
     queued_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     UNIQUE(media_type, external_id)
 );
@@ -154,10 +167,10 @@ CREATE TABLE deletion_queue (
 If configured in Siftarr's settings, Siftarr queries Tautulli to retrieve watch stats for items in the library.
 *   **Resolve Rating Key (Movies)**:
     *   Query: `GET /api/v2?apikey={key}&cmd=get_library_media_info`
-    *   Parameters: `rating_key` matches are verified by searching for matching TMDB ID (`tmdb_id`) or IMDb ID (`imdb_id`) in Tautulli's metadata.
+    *   Parameters: `rating_key` matches are verified by searching for matching TMDB ID (`tmdb_id`) or IMDb ID (`imdb_id`) in Tautulli's metadata. If `tautulli_section_id` is configured for the active library, the query includes `section_id={tautulli_section_id}` to isolate searches to that specific Plex library section.
 *   **Resolve Rating Key (TV Shows)**:
     *   Query: `GET /api/v2?apikey={key}&cmd=get_library_media_info`
-    *   Parameters: Matches the Sonarr series TVDB ID (`tvdb_id`) or IMDb ID (`imdb_id`) to the Tautulli library rating key.
+    *   Parameters: Matches the Sonarr series TVDB ID (`tvdb_id`) or IMDb ID (`imdb_id`) to the Tautulli library rating key. If `tautulli_section_id` is configured, it restricts query results using `section_id={tautulli_section_id}`.
 *   **Retrieve Watch Stats**:
     *   Query: `GET /api/v2?apikey={key}&cmd=get_item_watch_time_stats&rating_key={rating_key}`
     *   Response yields:
@@ -165,9 +178,12 @@ If configured in Siftarr's settings, Siftarr queries Tautulli to retrieve watch 
         *   `last_played`: Timestamp of last play activity (String/Epoch). For TV shows, represents the last played timestamp of any episode in the series.
         *   `total_watch_time`: Cumulative watch duration in seconds (Integer).
 
-### 4.5. Dynamic Service Lifecycle & Error Handling
-Siftarr is built to run with either or both *arr services configured.
+### 4.5. Dynamic Service Lifecycle & Library Filtering
+Siftarr is built to run with either or both *arr services configured and supports multiple library profiles.
 *   **Initialization**: The configuration module validates credentials on startup. Active integrations are flagged (`isRadarrEnabled`, `isSonarrEnabled`, `isTautulliEnabled`).
+*   **Active Library Root Path Filtering**:
+    *   When the client queries items for an active Library Profile, the backend fetches all items from Radarr or Sonarr.
+    *   If the profile defines `root_folder` (e.g. `/data/media/kids-movies/`), the backend filters the list to include only movies/shows whose file paths or series folders are subdirectories of that root path.
 *   **API Layer Resilience**:
     *   Routes corresponding to disabled services (e.g. `/api/series` when `isSonarrEnabled` is false) return a structured `200 OK` response with `{ enabled: false, items: [] }` or a descriptive error rather than causing server crashes.
     *   Settings page connection tests operate independently. A failure to connect to Sonarr will not prevent Radarr or Tautulli settings from being tested or saved successfully.
