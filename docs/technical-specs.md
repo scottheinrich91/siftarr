@@ -4,11 +4,43 @@ This document outlines the system architecture, database design, API integration
 
 ---
 
-## 1. Database Schema (`siftarr.db`)
+## 1. Application Paths & Configuration
+
+Siftarr stores all user data in a single directory to support simple Docker volume mounting:
+*   **Docker Container Path**: `/config`
+*   **Local Host Default**: `~/.config/siftarr`
+*   **Environment Override**: `SIFTARR_CONFIG_DIR`
+
+The `/config` directory contains:
+*   `siftarr.db`: The SQLite database.
+*   `logs/`: Folder containing Winston log rotation output:
+    *   `siftarr.log`: standard information-level logs.
+    *   `siftarr.debug.log`: diagnostic debug-level logs.
+    *   `siftarr.trace.log`: granular tracing of HTTP requests, API payloads, and query execution.
+
+### 1.1. API Authentication & Security
+On first startup, if no API key exists, Siftarr generates a random 32-character hex string (e.g., using `crypto.randomBytes(16).toString('hex')`) and saves it to the `settings` table. 
+*   All requests to the backend server must present this key in the `X-Api-Key` HTTP header or as an `apikey` query parameter.
+*   If invalid or missing, the server responds with `401 Unauthorized`.
+
+---
+
+## 2. Database Schema & Migration Engine
 
 Siftarr uses SQLite (`better-sqlite3`) to store settings, cache external API responses, manage the deletion review queue, and log curation activities.
+Instead of raw schema creation, Siftarr uses a sequential migration engine running on application startup. Migrations are saved as SQL files in `server/src/db/migrations/` and run within a transaction.
 
-### 1.1. Table: `settings`
+### 2.1. Table: `schema_version`
+Tracks database schema migrations:
+```sql
+CREATE TABLE schema_version (
+    version INTEGER PRIMARY KEY,
+    name TEXT NOT NULL,
+    applied_at DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+```
+
+### 2.2. Table: `settings`
 Stores configuration values. Eliminates the need for text-based YAML configuration files.
 ```sql
 CREATE TABLE settings (
@@ -17,9 +49,9 @@ CREATE TABLE settings (
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 ```
-*Standard Keys*: `radarr_url`, `radarr_api_key`, `sonarr_url`, `sonarr_api_key`, `tautulli_url`, `tautulli_api_key`, `tmdb_api_key`, `is_tautulli_enabled`, `quality_profile_mappings`, `delete_file_on_upgrade`, `delete_file_on_downgrade`.
+*Standard Keys*: `api_key`, `dry_run`, `enable_undo`, `radarr_url`, `radarr_api_key`, `sonarr_url`, `sonarr_api_key`, `tautulli_url`, `tautulli_api_key`, `tmdb_api_key`, `is_tautulli_enabled`, `swipe_left_profile_id`, `swipe_right_profile_id`, `swipe_up_profile_id`, `delete_file_on_upgrade`, `delete_file_on_downgrade`.
 
-### 1.2. Table: `library_profiles`
+### 2.3. Table: `library_profiles`
 Allows users to segment their collections (e.g. Movies vs Kids Movies).
 ```sql
 CREATE TABLE library_profiles (
@@ -32,7 +64,7 @@ CREATE TABLE library_profiles (
 );
 ```
 
-### 1.3. Table: `arr_cache`
+### 2.4. Table: `arr_cache`
 Caches fetched *arr media metadata to ensure fast loading times and avoid network delays.
 ```sql
 CREATE TABLE arr_cache (
@@ -50,7 +82,7 @@ CREATE TABLE arr_cache (
 );
 ```
 
-### 1.4. Table: `tautulli_cache`
+### 2.5. Table: `tautulli_cache`
 Caches Plex playback metrics linked to TMDB/TVDB identifiers.
 ```sql
 CREATE TABLE tautulli_cache (
@@ -65,8 +97,8 @@ CREATE TABLE tautulli_cache (
 );
 ```
 
-### 1.5. Table: `review_queue`
-Holds items swiped down/marked for deletion, awaiting confirmation.
+### 2.6. Table: `review_queue`
+Holds items marked for deletion, awaiting confirmation.
 ```sql
 CREATE TABLE review_queue (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -82,7 +114,7 @@ CREATE TABLE review_queue (
 );
 ```
 
-### 1.6. Table: `activity_log`
+### 2.7. Table: `activity_log`
 Provides an audit log of all completed curation mutations.
 ```sql
 CREATE TABLE activity_log (
@@ -90,7 +122,7 @@ CREATE TABLE activity_log (
     external_id INTEGER NOT NULL,
     media_type TEXT NOT NULL,
     title TEXT NOT NULL,
-    action TEXT NOT NULL,         -- 'upgrade_remux', 'downgrade_webdl', 'delete', etc.
+    action TEXT NOT NULL,         -- 'upgrade_profile', 'downgrade_profile', 'delete', 'skipped', 'unmonitored'
     details TEXT,
     timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
 );
@@ -98,9 +130,9 @@ CREATE TABLE activity_log (
 
 ---
 
-## 2. API Pipelines & Curation Logic
+## 3. API Pipelines & Curation Logic
 
-### 2.1. API PUT Payload Completeness & File Deletion Logic
+### 3.1. API PUT Payload Completeness & File Deletion Logic
 When updating a movie's quality profile in Radarr (`PUT /api/v3/movie/{id}`), Siftarr implements a GET-modify-PUT pipeline:
 1. **GET**: Retrieve the full, up-to-date movie object from Radarr.
 2. **Modify**: Update only the `qualityProfileId` in memory.
@@ -111,44 +143,35 @@ When updating a movie's quality profile in Radarr (`PUT /api/v3/movie/{id}`), Si
 5. **PUT**: Send the complete, modified object back to Radarr. This guarantees that custom paths, tags, genres, or metadata are not dropped during execution.
 6. **Search Trigger**: Dispatch a search command (`MoviesSearch`) to force Radarr to query indexers and download a fresh file immediately.
 
-### 2.2. Radarr Custom Format Parsing
-Instead of re-implementing TRaSH scoring logic, Siftarr queries Radarr's `GET /api/v3/movie` API and extracts the score directly from the movie's active file payload:
-* Read `movie.movieFile.quality.customFormatScore` to get the current custom format score.
-* Read the `movie.movieFile.customFormats` array to extract active TRaSH tags (e.g. Dolby Vision, HDR10, Atmos, preferred release groups).
+### 3.2. Radarr Custom Format Parsing
+Siftarr queries Radarr's `GET /api/v3/movie` API and extracts custom format details:
+*   Read `movie.movieFile.quality.customFormatScore` to get the current custom format score.
+*   Read the `movie.movieFile.customFormats` array to extract active TRaSH tags (e.g., HDR10, Atmos).
 
-### 2.3. Tautulli API Integrations
+### 3.3. Tautulli API Integrations
 For active libraries, Siftarr resolves rating keys and pulls playback details:
-* **Lookup**: `GET /api/v2?apikey={key}&cmd=get_library_media_info`
-  - Filters by `section_id={tautulli_section_id}` to isolate Plex libraries.
-  - Matches the item's TMDB ID or TVDB ID to Plex metadata.
-* **Watch Stats**: `GET /api/v2?apikey={key}&cmd=get_item_watch_time_stats&rating_key={rating_key}`
-  - Fetches play count, watch duration, and last played timestamp.
-
-### 2.4. Recyclarr Integration Compatibility
-Siftarr is built to be compatible with **Recyclarr** and automated **TRaSH Guides** setups:
-* **Item-Level Assignment**: Siftarr modifies only the `qualityProfileId` field inside individual movie or show entities (the same as changing the profile assignment in the Radarr/Sonarr UI).
-* **Profile Definition Safety**: Siftarr does not modify global Quality Profile definitions or Custom Format scoring lists. Since Recyclarr only synchronizes global definitions and scores, scheduled Recyclarr runs will not overwrite Siftarr's per-item profile changes.
+*   **Lookup**: `GET /api/v2?apikey={key}&cmd=get_library_media_info`
+*   **Watch Stats**: `GET /api/v2?apikey={key}&cmd=get_item_watch_time_stats&rating_key={rating_key}`
 
 ---
 
-## 3. Curation Operations & Schedulers
+## 4. Curation Operations & Schedulers
 
-### 3.1. 7-Second Undo Buffer & Neutral Skip Routing
-To protect against accidental swipes, Siftarr executes profile updates and deletion queuing through an asynchronous in-memory scheduler:
-1. **Action Request**: The user swipes/taps an item. The frontend sends the action to the backend.
-2. **Immediate Return**: The backend creates a unique `transaction_id`, registers a pending task in-memory with a 7-second timeout, and returns `200 OK` to the frontend with the ID.
-3. **Staging**: The frontend displays a floating Undo Toast with a countdown timer.
-4. **Execution/Cancellation**:
-   - **Commit**: If 7 seconds elapse without an undo request, the backend executes the API PUT mutation or writes the item to the SQLite `review_queue`, logging the transaction in `activity_log`.
-   - **Undo**: If the user clicks `[ UNDO ]` on the frontend, the client sends a `POST /api/curate/undo` with the `transaction_id`. The backend clears the timeout, canceling the staged action, and returns success.
-5. **Neutral Skip Bypass**:
-   - If the user taps `Keep / Skip` (or inputs a neutral skip command), the client triggers `POST /api/curate/skip`.
-   - Siftarr's backend bypasses the 7-second buffer entirely, logs the event directly to the SQLite `activity_log` (with action: `skipped`), and returns immediately to advance the card deck without making any changes in Radarr/Sonarr.
+### 4.1. Configurable Client-Side 7-Second Undo Buffer & Neutral Skip Routing
+1. **Setting Control**: The undo buffer is controlled by the `enable_undo` setting (boolean, default: `false`).
+2. **When Disabled (Default)**:
+    - Triggering a curation swipe or hotkey immediately dispatches the request payload (`POST /api/v1/curate`) to the backend.
+    - The backend processes the change immediately and returns `200 OK`. The UI instantly advances to the next card. No toast or countdown is displayed.
+3. **When Enabled**:
+    - Triggering a curation action (swipe or hotkey) starts a local 7-second countdown on the client and displays the floating Undo Toast offset from the bottom navigation.
+    - **Commit**: If the 7-second countdown reaches 0 without interruption, the client dispatches the curate payload (`POST /api/v1/curate`) to the backend for immediate execution.
+    - **Undo**: If the user clicks `[ UNDO ]` during the 7-second window, the client cancels the local timer and returns the active card to the card stack. No API call is made.
+    - **Neutral Skip Bypass**: If the user skips (Spacebar/K), the client bypasses the timer entirely, dispatches the skip request (`POST /api/v1/curate/skip`) to the backend immediately to log the action, and advances the card deck.
 
-### 3.2. Serialized Deletion Queue Execution
-When confirming deletions in the Review Queue, sending dozens of concurrent HTTP DELETE requests to Radarr/Sonarr can overwhelm the container or the server. Siftarr processes deletions sequentially:
-* **Pipeline**: Deletions are processed using a serialized queue (e.g. using a promise chain or async queue).
-* **Execution**: Each deletion executes sequentially:
-  1. Call Radarr/Sonarr `DELETE /api/v3/movie/{id}?deleteFiles=true`.
-  2. Remove the row from the local `review_queue` table.
-  3. Emit a WebSocket event or update payload to the frontend with the progress (e.g., `3 of 12 items deleted`).
+### 4.2. Serialized Deletion Queue Execution
+When confirming deletions in the Review Queue, Siftarr processes deletions sequentially:
+*   **Pipeline**: Deletions are processed using an async queue.
+*   **Execution**: Each deletion executes sequentially:
+    1. Call Radarr/Sonarr `DELETE /api/v3/movie/{id}?deleteFiles=true`.
+    2. Remove the row from the local `review_queue` table.
+    3. Emit a progress event or update payload to the frontend with the progress (e.g. `3 of 12 items deleted`).

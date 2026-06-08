@@ -1,0 +1,17 @@
+version: "3.8"
+
+services:
+  siftarr:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: siftarr
+    ports:
+      - "8080:8080"
+    environment:
+      - TZ=America/Los_Angeles
+      - PUID=1000
+      - PGID=1000
+    volumes:
+      - ./config:/config
+    restart: unless-stopped

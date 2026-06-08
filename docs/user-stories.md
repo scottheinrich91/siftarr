@@ -26,37 +26,38 @@ This backlog organizes Siftarr's features and acceptance criteria into the three
     *   Plex icon is visible adjacent to the stats.
     *   Tautulli data is cached locally to ensure instant load times.
 
-#### User Story 1.3: Curation Swipes & Tap Action Buttons
+#### User Story 1.3: Curation Swipes
 *   **As a** user,
-*   **I want** swipe gestures and tap buttons below the cards,
+*   **I want** swipe gestures on the media cards,
 *   **So that** I can select standard WebDL (Left/Blue), BluRay (Right/Green), Remux (Up/Gold), or Delete (Down/Red).
 *   **Acceptance Criteria**:
-    *   Five buttons are visible at the bottom of the card stack.
-    *   Card borders scale and glow with the action's corresponding color dynamically only on drag or button tap.
-    *   Action triggers staging of the curation update.
+    *   No curation action buttons are displayed below the card stack; interactions are purely swipe gesture-based or keyboard hotkeys.
+    *   Card borders scale and glow with the action's corresponding color dynamically during card drag.
+    *   Action triggers staging of the curation update or deletion queue addition.
 
 #### User Story 1.4: Keep / Skip Action
 *   **As a** user,
-*   **I want** to tap a Slate Grey Skip/Keep button or press Spacebar/K,
+*   **I want** to press Spacebar or K,
 *   **So that** I can advance to the next card without changing any quality profiles or queueing deletions.
 *   **Acceptance Criteria**:
-    *   Tapping the Slate Grey Button (Checkmark icon) or pressing Spacebar/K bypasses the active card.
+    *   Pressing Spacebar or K bypasses the active card instantly.
     *   Logs the skipped action in the `activity_log` SQLite table.
-    *   The card stack animates and advances immediately without triggering the 7-second undo toast or calling *arr APIs.
+    *   The card stack animates and advances immediately without triggering the 7-second undo buffer or calling *arr APIs.
 
 ---
 
 ### Epic 2: Safety & Undo Actions
 
-#### User Story 2.1: 7-Second Undo Buffer
+#### User Story 2.1: Configurable 7-Second Undo Buffer
 *   **As a** user,
-*   **I want** a 7-second window to reverse my curation decisions,
-*   **So that** I do not accidentally downgrade or delete files due to a mis-swipe.
+*   **I want** the option to enable a 7-second window to reverse my curation decisions,
+*   **So that** I can undo accidental swipes or hotkey presses if I choose to enable this protection.
 *   **Acceptance Criteria**:
-    *   Performing an action displays a floating bottom toast with a 7-second countdown.
+    *   An option to enable the 7-second undo buffer is available in `Settings > General` (disabled by default).
+    *   When enabled, performing a swipe or hotkey action displays a floating bottom toast with a 7-second countdown.
     *   Toast has a countdown ring and an `[ UNDO ]` button.
     *   Clicking undo halts the operation and returns the card back to the stack.
-    *   If the timer expires, backend commits the API/database change.
+    *   If the timer expires, or if the buffer is disabled, the action commits immediately.
 
 #### User Story 2.2: Desktop Hotkey Isolation
 *   **As a** desktop user,

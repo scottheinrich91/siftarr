@@ -35,6 +35,7 @@ sqlite.db
 *.key
 
 # Local Configs
+config/
 config.yml
 config.json
 
